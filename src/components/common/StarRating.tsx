@@ -13,7 +13,7 @@ export function StarRating({ value, onChange, readonly = false, size = 20 }: Sta
   const starStyle = (n: number): CSSProperties => ({
     cursor: readonly ? 'default' : 'pointer',
     fontSize: `${size}px`,
-    color: value !== undefined && n <= value ? '#f59e0b' : '#4b5563',
+    color: value !== undefined && n <= value ? '#f59e0b' : '#d1d5db',
     transition: 'color 0.15s',
     padding: '0 1px',
     userSelect: 'none',

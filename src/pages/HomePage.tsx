@@ -20,16 +20,16 @@ const filterBarStyle: CSSProperties = {
   gap: '8px',
   marginBottom: '20px',
   padding: '12px',
-  backgroundColor: '#1e1b3a',
+  backgroundColor: '#fff0f3',
   borderRadius: '12px',
 };
 
 const filterInputStyle: CSSProperties = {
   padding: '6px 10px',
-  border: '1px solid #4b5563',
+  border: '1px solid #f9a8d4',
   borderRadius: '6px',
-  backgroundColor: '#1f2937',
-  color: '#e5e7eb',
+  backgroundColor: '#ffffff',
+  color: '#1f2937',
   fontSize: '13px',
 };
 
@@ -42,7 +42,7 @@ const gridStyle: CSSProperties = {
 const emptyStyle: CSSProperties = {
   textAlign: 'center',
   padding: '60px 20px',
-  color: '#9ca3af',
+  color: '#6b7280',
   fontSize: '16px',
 };
 
@@ -62,14 +62,14 @@ export function HomePage() {
   return (
     <div style={containerStyle}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#e5e7eb', margin: 0 }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1f2937', margin: 0 }}>
           マイアニメリスト
         </h1>
         <Link
           to="/add"
           style={{
             padding: '8px 16px',
-            backgroundColor: '#6366f1',
+            backgroundColor: '#ec4899',
             color: '#fff',
             textDecoration: 'none',
             borderRadius: '8px',
@@ -126,7 +126,7 @@ export function HomePage() {
             <option key={n} value={n}>{'★'.repeat(n)}</option>
           ))}
         </select>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#9ca3af', cursor: 'pointer' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#6b7280', cursor: 'pointer' }}>
           <input
             type="checkbox"
             checked={filters.hasComment === true}
@@ -142,7 +142,7 @@ export function HomePage() {
             <>
               <div style={{ fontSize: '48px', marginBottom: '12px' }}>📺</div>
               <p>まだアニメが登録されていません</p>
-              <Link to="/add" style={{ color: '#818cf8' }}>最初のアニメを追加する →</Link>
+              <Link to="/add" style={{ color: '#ec4899' }}>最初のアニメを追加する →</Link>
             </>
           ) : (
             <p>フィルター条件に一致するアニメがありません</p>

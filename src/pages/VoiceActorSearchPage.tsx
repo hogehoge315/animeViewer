@@ -14,7 +14,7 @@ const workCardStyle: CSSProperties = {
   display: 'flex',
   gap: '10px',
   padding: '10px',
-  backgroundColor: '#252248',
+  backgroundColor: '#fff0f3',
   borderRadius: '8px',
   alignItems: 'center',
   marginBottom: '6px',
@@ -26,7 +26,7 @@ const thumbStyle: CSSProperties = {
   objectFit: 'cover',
   borderRadius: '4px',
   flexShrink: 0,
-  backgroundColor: '#312e5c',
+  backgroundColor: '#fce7f3',
 };
 
 const actionBtnStyle: CSSProperties = {
@@ -49,7 +49,7 @@ export function VoiceActorSearchPage() {
 
   return (
     <div style={containerStyle}>
-      <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#e5e7eb', marginBottom: '16px' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1f2937', marginBottom: '16px' }}>
         声優検索
       </h1>
 
@@ -64,7 +64,7 @@ export function VoiceActorSearchPage() {
       </div>
 
       {results.length === 0 && query.trim() && !loading && (
-        <div style={{ textAlign: 'center', color: '#9ca3af', padding: '40px' }}>
+        <div style={{ textAlign: 'center', color: '#6b7280', padding: '40px' }}>
           結果が見つかりません
         </div>
       )}
@@ -75,16 +75,16 @@ export function VoiceActorSearchPage() {
           style={{
             marginBottom: '20px',
             padding: '16px',
-            backgroundColor: '#1e1b3a',
+            backgroundColor: '#ffffff',
             borderRadius: '12px',
-            border: '1px solid #312e5c',
+            border: '1px solid #fbcfe8',
           }}
         >
-          <h3 style={{ margin: '0 0 4px 0', color: '#c4b5fd', fontSize: '16px' }}>
+          <h3 style={{ margin: '0 0 4px 0', color: '#ec4899', fontSize: '16px' }}>
             {staff.name}
           </h3>
           {staff.nameNative && (
-            <div style={{ color: '#9ca3af', fontSize: '13px', marginBottom: '10px' }}>
+            <div style={{ color: '#6b7280', fontSize: '13px', marginBottom: '10px' }}>
               {staff.nameNative}
             </div>
           )}
@@ -102,10 +102,10 @@ export function VoiceActorSearchPage() {
                     <div style={thumbStyle} />
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ color: '#e5e7eb', fontSize: '14px', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ color: '#1f2937', fontSize: '14px', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {work.title}
                     </div>
-                    <div style={{ color: '#6b7280', fontSize: '11px' }}>
+                    <div style={{ color: '#9ca3af', fontSize: '11px' }}>
                       {work.genres.slice(0, 3).join(', ')}
                     </div>
                   </div>
@@ -127,7 +127,7 @@ export function VoiceActorSearchPage() {
                       onClick={() => navigate(`/add?mediaId=${work.mediaId}&title=${encodeURIComponent(work.title)}`)}
                       style={{
                         ...actionBtnStyle,
-                        backgroundColor: '#6366f1',
+                        backgroundColor: '#ec4899',
                         color: '#fff',
                       }}
                     >
