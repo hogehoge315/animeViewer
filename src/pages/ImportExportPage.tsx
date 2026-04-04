@@ -11,14 +11,14 @@ const containerStyle: CSSProperties = {
 const sectionStyle: CSSProperties = {
   marginBottom: '32px',
   padding: '20px',
-  backgroundColor: '#1e1b3a',
+  backgroundColor: '#ffffff',
   borderRadius: '12px',
-  border: '1px solid #312e5c',
+  border: '1px solid #fbcfe8',
 };
 
 const btnPrimary: CSSProperties = {
   padding: '10px 20px',
-  backgroundColor: '#6366f1',
+  backgroundColor: '#ec4899',
   color: '#fff',
   border: 'none',
   borderRadius: '8px',
@@ -30,8 +30,8 @@ const btnPrimary: CSSProperties = {
 const btnOutline: CSSProperties = {
   padding: '10px 20px',
   backgroundColor: 'transparent',
-  color: '#9ca3af',
-  border: '1px solid #4b5563',
+  color: '#6b7280',
+  border: '1px solid #f9a8d4',
   borderRadius: '8px',
   fontSize: '14px',
   cursor: 'pointer',
@@ -58,15 +58,15 @@ export function ImportExportPage() {
 
   return (
     <div style={containerStyle}>
-      <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#e5e7eb', marginBottom: '24px' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1f2937', marginBottom: '24px' }}>
         インポート / エクスポート
       </h1>
 
       <div style={sectionStyle}>
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#c4b5fd', marginTop: 0, marginBottom: '12px' }}>
+        <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#ec4899', marginTop: 0, marginBottom: '12px' }}>
           エクスポート
         </h2>
-        <p style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '12px' }}>
+        <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '12px' }}>
           全てのアニメデータをJSONファイルとしてダウンロードします。
         </p>
         <button type="button" onClick={handleExport} style={btnPrimary}>
@@ -75,10 +75,10 @@ export function ImportExportPage() {
       </div>
 
       <div style={sectionStyle}>
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#c4b5fd', marginTop: 0, marginBottom: '12px' }}>
+        <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#ec4899', marginTop: 0, marginBottom: '12px' }}>
           インポート
         </h2>
-        <p style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '12px' }}>
+        <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '12px' }}>
           エクスポートしたJSONファイルからデータを読み込みます。
         </p>
 
@@ -98,23 +98,23 @@ export function ImportExportPage() {
         </button>
 
         {importError.length > 0 && (
-          <div style={{ marginTop: '12px', padding: '10px', backgroundColor: '#451a1a', borderRadius: '8px' }}>
+          <div style={{ marginTop: '12px', padding: '10px', backgroundColor: '#fef2f2', borderRadius: '8px' }}>
             <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: 600, marginBottom: '4px' }}>
               エラー
             </div>
             {importError.map((err, i) => (
-              <div key={i} style={{ color: '#fca5a5', fontSize: '13px' }}>{err}</div>
+              <div key={i} style={{ color: '#ef4444', fontSize: '13px' }}>{err}</div>
             ))}
           </div>
         )}
 
         {importPreview && (
-          <div style={{ marginTop: '12px', padding: '12px', backgroundColor: '#1f2937', borderRadius: '8px' }}>
-            <div style={{ color: '#e5e7eb', fontSize: '14px', marginBottom: '8px' }}>
+          <div style={{ marginTop: '12px', padding: '12px', backgroundColor: '#fff0f3', borderRadius: '8px' }}>
+            <div style={{ color: '#1f2937', fontSize: '14px', marginBottom: '8px' }}>
               <strong>{importPreview.entryCount}</strong> 件のエントリ（バージョン: {importPreview.version}）
             </div>
             <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#9ca3af', fontSize: '13px', cursor: 'pointer', marginBottom: '4px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#6b7280', fontSize: '13px', cursor: 'pointer', marginBottom: '4px' }}>
                 <input
                   type="radio"
                   name="importMode"
@@ -123,7 +123,7 @@ export function ImportExportPage() {
                 />
                 マージ（既存データと統合）
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#9ca3af', fontSize: '13px', cursor: 'pointer' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#6b7280', fontSize: '13px', cursor: 'pointer' }}>
                 <input
                   type="radio"
                   name="importMode"

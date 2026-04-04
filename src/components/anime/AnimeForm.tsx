@@ -26,17 +26,17 @@ const labelStyle: CSSProperties = {
   display: 'block',
   marginBottom: '4px',
   fontSize: '13px',
-  color: '#9ca3af',
+  color: '#6b7280',
   fontWeight: 600,
 };
 
 const inputStyle: CSSProperties = {
   width: '100%',
   padding: '8px 12px',
-  border: '1px solid #4b5563',
+  border: '1px solid #f9a8d4',
   borderRadius: '8px',
-  backgroundColor: '#1f2937',
-  color: '#e5e7eb',
+  backgroundColor: '#ffffff',
+  color: '#1f2937',
   fontSize: '14px',
   boxSizing: 'border-box',
 };
@@ -151,7 +151,7 @@ export function AnimeForm({ initial, onSubmit, submitLabel = '保存' }: AnimeFo
         type="submit"
         style={{
           padding: '10px 24px',
-          backgroundColor: '#6366f1',
+          backgroundColor: '#ec4899',
           color: '#fff',
           border: 'none',
           borderRadius: '8px',

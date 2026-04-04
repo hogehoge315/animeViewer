@@ -20,10 +20,10 @@ const sectionStyle: CSSProperties = {
 const tagStyle: CSSProperties = {
   display: 'inline-block',
   padding: '3px 10px',
-  backgroundColor: '#312e5c',
+  backgroundColor: '#fce7f3',
   borderRadius: '16px',
   fontSize: '12px',
-  color: '#c4b5fd',
+  color: '#db2777',
   marginRight: '6px',
   marginBottom: '4px',
 };
@@ -40,7 +40,7 @@ export function DetailPage() {
   if (!entry) {
     return (
       <div style={containerStyle}>
-        <p style={{ color: '#9ca3af' }}>アニメが見つかりません</p>
+        <p style={{ color: '#6b7280' }}>アニメが見つかりません</p>
       </div>
     );
   }
@@ -67,7 +67,7 @@ export function DetailPage() {
   if (editing) {
     return (
       <div style={containerStyle}>
-        <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#e5e7eb', marginBottom: '16px' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1f2937', marginBottom: '16px' }}>
           編集
         </h1>
         <AnimeForm
@@ -92,9 +92,9 @@ export function DetailPage() {
             marginTop: '12px',
             padding: '8px 16px',
             backgroundColor: 'transparent',
-            border: '1px solid #4b5563',
+            border: '1px solid #f9a8d4',
             borderRadius: '8px',
-            color: '#9ca3af',
+            color: '#6b7280',
             cursor: 'pointer',
             fontSize: '14px',
           }}
@@ -115,15 +115,15 @@ export function DetailPage() {
             style={{ width: '140px', height: '200px', objectFit: 'cover', borderRadius: '10px', flexShrink: 0 }}
           />
         ) : (
-          <div style={{ width: '140px', height: '200px', backgroundColor: '#312e5c', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px', flexShrink: 0 }}>
+          <div style={{ width: '140px', height: '200px', backgroundColor: '#fce7f3', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px', flexShrink: 0 }}>
             🎬
           </div>
         )}
         <div>
-          <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#e5e7eb', marginTop: 0, marginBottom: '8px' }}>
+          <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1f2937', marginTop: 0, marginBottom: '8px' }}>
             {entry.title}
           </h1>
-          <div style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '8px' }}>{entry.season}</div>
+          <div style={{ color: '#6b7280', fontSize: '14px', marginBottom: '8px' }}>{entry.season}</div>
           <StarRating value={entry.rating} readonly size={20} />
           <div style={{ marginTop: '8px' }}><StatusBadge status={entry.watchStatus} /></div>
         </div>
@@ -131,15 +131,15 @@ export function DetailPage() {
 
       {entry.genres.length > 0 && (
         <div style={sectionStyle}>
-          <h3 style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '6px' }}>ジャンル</h3>
+          <h3 style={{ fontSize: '14px', color: '#6b7280', marginBottom: '6px' }}>ジャンル</h3>
           <div>{entry.genres.map((g) => <span key={g} style={tagStyle}>{g}</span>)}</div>
         </div>
       )}
 
       {entry.comment && (
         <div style={sectionStyle}>
-          <h3 style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '6px' }}>コメント</h3>
-          <p style={{ color: '#e5e7eb', backgroundColor: '#1e1b3a', padding: '12px', borderRadius: '8px', whiteSpace: 'pre-wrap', margin: 0 }}>
+          <h3 style={{ fontSize: '14px', color: '#6b7280', marginBottom: '6px' }}>コメント</h3>
+          <p style={{ color: '#1f2937', backgroundColor: '#fff0f3', padding: '12px', borderRadius: '8px', whiteSpace: 'pre-wrap', margin: 0 }}>
             {entry.comment}
           </p>
         </div>
@@ -147,7 +147,7 @@ export function DetailPage() {
 
       {entry.voiceActors.length > 0 && (
         <div style={sectionStyle}>
-          <h3 style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '6px' }}>声優</h3>
+          <h3 style={{ fontSize: '14px', color: '#6b7280', marginBottom: '6px' }}>声優</h3>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
             {entry.voiceActors.map((va) => (
               <span key={va.id} style={tagStyle}>
@@ -158,7 +158,7 @@ export function DetailPage() {
         </div>
       )}
 
-      <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '20px' }}>
+      <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '20px' }}>
         <div>登録日: {new Date(entry.createdAt).toLocaleDateString('ja-JP')}</div>
         <div>更新日: {new Date(entry.updatedAt).toLocaleDateString('ja-JP')}</div>
       </div>
@@ -169,7 +169,7 @@ export function DetailPage() {
           onClick={() => setEditing(true)}
           style={{
             padding: '8px 16px',
-            backgroundColor: '#6366f1',
+            backgroundColor: '#ec4899',
             color: '#fff',
             border: 'none',
             borderRadius: '8px',
@@ -220,8 +220,8 @@ export function DetailPage() {
               style={{
                 padding: '6px 14px',
                 backgroundColor: 'transparent',
-                color: '#9ca3af',
-                border: '1px solid #4b5563',
+                color: '#6b7280',
+                border: '1px solid #f9a8d4',
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontSize: '13px',

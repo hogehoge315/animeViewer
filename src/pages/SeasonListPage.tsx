@@ -25,7 +25,7 @@ export function SeasonListPage() {
 
   return (
     <div style={containerStyle}>
-      <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#e5e7eb', marginBottom: '16px' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1f2937', marginBottom: '16px' }}>
         シーズン別一覧
       </h1>
 
@@ -34,10 +34,10 @@ export function SeasonListPage() {
         onChange={(e) => setSelectedSeason(e.target.value)}
         style={{
           padding: '8px 12px',
-          border: '1px solid #4b5563',
+          border: '1px solid #f9a8d4',
           borderRadius: '8px',
-          backgroundColor: '#1f2937',
-          color: '#e5e7eb',
+          backgroundColor: '#ffffff',
+          color: '#1f2937',
           fontSize: '14px',
           marginBottom: '20px',
         }}
@@ -49,7 +49,7 @@ export function SeasonListPage() {
       </select>
 
       {displaySeasons.length === 0 && (
-        <div style={{ textAlign: 'center', color: '#9ca3af', padding: '40px' }}>
+        <div style={{ textAlign: 'center', color: '#6b7280', padding: '40px' }}>
           まだアニメが登録されていません
         </div>
       )}
@@ -59,11 +59,11 @@ export function SeasonListPage() {
         const stats = computeSeasonStats(seasonEntries);
         return (
           <div key={season} style={{ marginBottom: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', borderBottom: '1px solid #312e5c', paddingBottom: '8px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#c4b5fd', margin: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', borderBottom: '1px solid #fbcfe8', paddingBottom: '8px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#ec4899', margin: 0 }}>
                 {season}
               </h2>
-              <div style={{ fontSize: '13px', color: '#9ca3af' }}>
+              <div style={{ fontSize: '13px', color: '#6b7280' }}>
                 {stats.count}作品
                 {stats.avgRating !== null && ` | 平均 ${stats.avgRating.toFixed(1)}★`}
               </div>
@@ -78,11 +78,11 @@ export function SeasonListPage() {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     padding: '8px 12px',
-                    backgroundColor: '#1e1b3a',
+                    backgroundColor: '#fff0f3',
                     borderRadius: '8px',
                     textDecoration: 'none',
-                    color: '#e5e7eb',
-                    border: '1px solid #312e5c',
+                    color: '#1f2937',
+                    border: '1px solid #fbcfe8',
                   }}
                 >
                   <span style={{ fontWeight: 500 }}>{entry.title}</span>

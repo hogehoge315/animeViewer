@@ -19,10 +19,10 @@ const searchResultStyle: CSSProperties = {
   display: 'flex',
   gap: '10px',
   padding: '10px',
-  backgroundColor: '#1e1b3a',
+  backgroundColor: '#fff0f3',
   borderRadius: '8px',
   cursor: 'pointer',
-  border: '1px solid #312e5c',
+  border: '1px solid #fbcfe8',
   marginBottom: '6px',
   alignItems: 'center',
 };
@@ -74,13 +74,13 @@ export function AddAnimePage() {
 
   return (
     <div style={containerStyle}>
-      <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#e5e7eb', marginBottom: '20px' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1f2937', marginBottom: '20px' }}>
         アニメを追加
       </h1>
 
       {showSearch && (
         <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '6px', color: '#9ca3af', fontSize: '13px', fontWeight: 600 }}>
+          <label style={{ display: 'block', marginBottom: '6px', color: '#6b7280', fontSize: '13px', fontWeight: 600 }}>
             AniListで検索（任意）
           </label>
           <SearchInput
@@ -103,10 +103,10 @@ export function AddAnimePage() {
                     <img src={media.coverImage.medium} alt="" style={thumbStyle} />
                   )}
                   <div>
-                    <div style={{ color: '#e5e7eb', fontSize: '14px', fontWeight: 600 }}>
+                    <div style={{ color: '#1f2937', fontSize: '14px', fontWeight: 600 }}>
                       {extractTitle(media)}
                     </div>
-                    <div style={{ color: '#9ca3af', fontSize: '12px' }}>
+                    <div style={{ color: '#6b7280', fontSize: '12px' }}>
                       {media.genres.slice(0, 3).join(', ')}
                     </div>
                   </div>
@@ -122,9 +122,9 @@ export function AddAnimePage() {
               marginTop: '8px',
               padding: '6px 12px',
               backgroundColor: 'transparent',
-              border: '1px solid #4b5563',
+              border: '1px solid #f9a8d4',
               borderRadius: '6px',
-              color: '#9ca3af',
+              color: '#6b7280',
               fontSize: '13px',
               cursor: 'pointer',
             }}
@@ -135,18 +135,18 @@ export function AddAnimePage() {
       )}
 
       {!showSearch && selectedMedia && (
-        <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#1e1b3a', borderRadius: '8px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#fff0f3', borderRadius: '8px', display: 'flex', gap: '12px', alignItems: 'center' }}>
           {extractCoverImage(selectedMedia) && (
             <img src={extractCoverImage(selectedMedia)} alt="" style={{ width: '60px', height: '85px', objectFit: 'cover', borderRadius: '6px' }} />
           )}
           <div>
-            <div style={{ color: '#e5e7eb', fontWeight: 600 }}>{extractTitle(selectedMedia)}</div>
-            <div style={{ color: '#9ca3af', fontSize: '12px' }}>{selectedMedia.genres.join(', ')}</div>
+            <div style={{ color: '#1f2937', fontWeight: 600 }}>{extractTitle(selectedMedia)}</div>
+            <div style={{ color: '#6b7280', fontSize: '12px' }}>{selectedMedia.genres.join(', ')}</div>
           </div>
           <button
             type="button"
             onClick={() => { setSelectedMedia(null); setShowSearch(true); }}
-            style={{ marginLeft: 'auto', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}
+            style={{ marginLeft: 'auto', color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}
           >
             変更
           </button>

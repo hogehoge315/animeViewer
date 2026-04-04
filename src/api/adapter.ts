@@ -2,7 +2,7 @@ import type { VoiceActor } from '../domain/types.ts';
 import type { AniListMedia, AniListStaff } from './anilist/types.ts';
 
 export function extractTitle(media: AniListMedia): string {
-  return media.title.romaji || media.title.english || media.title.native || 'Unknown';
+  return media.title.native || media.title.romaji || media.title.english || 'Unknown';
 }
 
 export function extractCoverImage(media: AniListMedia): string | undefined {
@@ -50,9 +50,9 @@ export function adaptStaffResult(staff: AniListStaff): StaffWithWorks {
     works: staff.characterMedia.edges.map((edge) => ({
       mediaId: edge.node.id,
       title:
+        edge.node.title.native ||
         edge.node.title.romaji ||
         edge.node.title.english ||
-        edge.node.title.native ||
         'Unknown',
       coverImage: edge.node.coverImage?.large || edge.node.coverImage?.medium || undefined,
       genres: edge.node.genres,

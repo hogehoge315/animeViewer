@@ -12,9 +12,9 @@ const cardStyle: CSSProperties = {
   display: 'flex',
   gap: '12px',
   padding: '12px',
-  backgroundColor: '#1e1b3a',
+  backgroundColor: '#ffffff',
   borderRadius: '12px',
-  border: '1px solid #312e5c',
+  border: '1px solid #fbcfe8',
   textDecoration: 'none',
   color: 'inherit',
   transition: 'border-color 0.2s',
@@ -26,7 +26,7 @@ const imageStyle: CSSProperties = {
   objectFit: 'cover',
   borderRadius: '6px',
   flexShrink: 0,
-  backgroundColor: '#312e5c',
+  backgroundColor: '#fce7f3',
 };
 
 const bodyStyle: CSSProperties = {
@@ -40,7 +40,7 @@ const bodyStyle: CSSProperties = {
 const titleStyle: CSSProperties = {
   fontSize: '15px',
   fontWeight: 600,
-  color: '#e5e7eb',
+  color: '#1f2937',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
@@ -48,7 +48,7 @@ const titleStyle: CSSProperties = {
 
 const metaStyle: CSSProperties = {
   fontSize: '12px',
-  color: '#9ca3af',
+  color: '#6b7280',
 };
 
 export function AnimeCard({ entry }: AnimeCardProps) {
