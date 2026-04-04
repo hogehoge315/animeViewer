@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { HashRouter, Routes, Route, NavLink } from 'react-router-dom';
 import { HomePage } from './pages/HomePage.tsx';
 import { AddAnimePage } from './pages/AddAnimePage.tsx';
 import { SeasonListPage } from './pages/SeasonListPage.tsx';
@@ -63,7 +63,7 @@ const globalCSS = `
 
 export function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <style>{globalCSS}</style>
       <div style={appStyle}>
         <NavBar />
@@ -76,6 +76,6 @@ export function App() {
           <Route path="/voice-actors" element={<VoiceActorSearchPage />} />
         </Routes>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
