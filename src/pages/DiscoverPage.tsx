@@ -5,6 +5,7 @@ import { POPULARITY_RANKING_QUERY } from '../api/anilist/queries.ts';
 import type { AniListPagedResult, AniListMedia } from '../api/anilist/types.ts';
 import { AnimeDetailModal } from '../components/anime/AnimeDetailModal.tsx';
 import type { CSSProperties } from 'react';
+import { VoiceActorSearchPage } from './VoiceActorSearchPage.tsx';
 
 type AniListSeason = 'WINTER' | 'SPRING' | 'SUMMER' | 'FALL';
 
@@ -55,6 +56,7 @@ function extractTitle(media: AniListMedia): string {
 
 export function DiscoverPage() {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'anime' | 'voice'>('anime');
   const { season: currentSeason, year: currentYear } = getCurrentSeason();
   const [selectedYear, setSelectedYear] = useState<number | undefined>(currentYear);
   const [selectedSeasonName, setSelectedSeasonName] = useState<AniListSeason | undefined>(currentSeason);
@@ -98,7 +100,34 @@ export function DiscoverPage() {
   }, [fetchData]);
 
   return (
-    <div style={containerStyle}>
+    <>
+      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px 20px 0' }}>
+        <div style={{ display: 'flex', gap: '4px', marginBottom: '16px', backgroundColor: '#fce7f3', borderRadius: '10px', padding: '4px' }}>
+          {(['anime', 'voice'] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setActiveTab(tab)}
+              style={{
+                flex: 1,
+                padding: '8px',
+                borderRadius: '8px',
+                border: 'none',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                backgroundColor: activeTab === tab ? '#ec4899' : 'transparent',
+                color: activeTab === tab ? '#fff' : '#6b7280',
+                transition: 'background-color 0.15s, color 0.15s',
+              }}
+            >
+              {tab === 'anime' ? 'アニメを探す' : '声優を探す'}
+            </button>
+          ))}
+        </div>
+      </div>
+      {activeTab === 'anime' ? (
+        <div style={containerStyle}>
       <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1f2937', marginBottom: '16px' }}>
         アニメを探す
       </h1>
@@ -310,6 +339,10 @@ export function DiscoverPage() {
           </button>
         </div>
       )}
-    </div>
+        </div>
+      ) : (
+        <VoiceActorSearchPage />
+      )}
+    </>
   );
 }

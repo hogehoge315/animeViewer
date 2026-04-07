@@ -1,7 +1,12 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useVoiceActorSearch } from '../hooks/useAniListSearch.ts';
 import { useAnimeEntries } from '../hooks/useAnimeEntries.ts';
+import { useFavoriteVoiceActors } from '../hooks/useFavoriteVoiceActors.ts';
 import { SearchInput } from '../components/common/SearchInput.tsx';
+import { AnimeDetailModal } from '../components/anime/AnimeDetailModal.tsx';
+import type { AniListMedia } from '../api/anilist/types.ts';
+import type { StaffWithWorks } from '../api/adapter.ts';
 import type { CSSProperties } from 'react';
 
 const containerStyle: CSSProperties = {
@@ -54,10 +59,20 @@ const roleBadgeStyle: CSSProperties = {
   flexShrink: 0,
 };
 
+const toAniListMedia = (work: StaffWithWorks['works'][number]): AniListMedia => ({
+  id: work.mediaId,
+  title: { native: work.title, romaji: null, english: null },
+  coverImage: work.coverImage ? { medium: work.coverImage, large: work.coverImage } : null,
+  episodes: work.totalEpisodes,
+  genres: work.genres,
+});
+
 export function VoiceActorSearchPage() {
   const navigate = useNavigate();
   const { query, search, results, loading, error } = useVoiceActorSearch();
   const { entries } = useAnimeEntries();
+  const { favorites, isFavorite, toggleFavorite } = useFavoriteVoiceActors();
+  const [detailWork, setDetailWork] = useState<StaffWithWorks['works'][number] | null>(null);
 
   const existingMediaIds = new Set(entries.filter((e) => e.anilistMediaId).map((e) => e.anilistMediaId));
   const getRoleIcon = (role?: (typeof results)[number]['works'][number]['characterRole']) => {
@@ -72,6 +87,42 @@ export function VoiceActorSearchPage() {
       <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1f2937', marginBottom: '16px' }}>
         声優検索
       </h1>
+
+      {favorites.length > 0 && (
+        <div style={{ marginBottom: '20px' }}>
+          <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#1f2937', marginBottom: '10px' }}>
+            ⭐ お気に入り声優
+          </h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {favorites.map((fav) => (
+              <button
+                key={fav.id}
+                type="button"
+                onClick={() => search(fav.name)}
+                style={{
+                  padding: '6px 14px',
+                  backgroundColor: '#fce7f3',
+                  border: '1px solid #f9a8d4',
+                  borderRadius: '20px',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  color: '#db2777',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <span>⭐</span>
+                <span>{fav.name}</span>
+                {fav.nameNative && (
+                  <span style={{ color: '#9ca3af', fontSize: '11px' }}>({fav.nameNative})</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div style={{ marginBottom: '20px' }}>
         <SearchInput
@@ -100,9 +151,25 @@ export function VoiceActorSearchPage() {
             border: '1px solid #fbcfe8',
           }}
         >
-          <h3 style={{ margin: '0 0 4px 0', color: '#ec4899', fontSize: '16px' }}>
-            {staff.name}
-          </h3>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+            <h3 style={{ margin: 0, color: '#ec4899', fontSize: '16px' }}>{staff.name}</h3>
+            <button
+              type="button"
+              onClick={() => toggleFavorite({ id: staff.id, name: staff.name, nameNative: staff.nameNative })}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '20px',
+                padding: '0 4px',
+                color: isFavorite(staff.id) ? '#f59e0b' : '#d1d5db',
+                flexShrink: 0,
+              }}
+              aria-label={isFavorite(staff.id) ? 'お気に入り解除' : 'お気に入り追加'}
+            >
+              {isFavorite(staff.id) ? '⭐' : '☆'}
+            </button>
+          </div>
           {staff.nameNative && (
             <div style={{ color: '#6b7280', fontSize: '13px', marginBottom: '10px' }}>
               {staff.nameNative}
@@ -115,7 +182,7 @@ export function VoiceActorSearchPage() {
               const existingEntry = entries.find((e) => e.anilistMediaId === work.mediaId);
 
               return (
-                <div key={work.mediaId} style={workCardStyle}>
+                <div key={work.mediaId} style={{ ...workCardStyle, cursor: 'pointer' }} onClick={() => setDetailWork(work)}>
                   {work.characterImage || work.coverImage ? (
                     <img src={work.characterImage || work.coverImage} alt="" style={thumbStyle} />
                   ) : (
@@ -147,7 +214,7 @@ export function VoiceActorSearchPage() {
                   {isExisting && existingEntry ? (
                     <button
                       type="button"
-                      onClick={() => navigate(`/anime/${existingEntry.id}`)}
+                      onClick={(e) => { e.stopPropagation(); navigate(`/anime/${existingEntry.id}`); }}
                       style={{
                         ...actionBtnStyle,
                         backgroundColor: '#22c55e',
@@ -159,7 +226,7 @@ export function VoiceActorSearchPage() {
                   ) : (
                     <button
                       type="button"
-                      onClick={() => navigate(`/add?mediaId=${work.mediaId}&title=${encodeURIComponent(work.title)}`)}
+                      onClick={(e) => { e.stopPropagation(); navigate(`/add?mediaId=${work.mediaId}&title=${encodeURIComponent(work.title)}`); }}
                       style={{
                         ...actionBtnStyle,
                         backgroundColor: '#ec4899',
@@ -175,6 +242,17 @@ export function VoiceActorSearchPage() {
           </div>
         </div>
       ))}
+
+      {detailWork && (
+        <AnimeDetailModal
+          media={toAniListMedia(detailWork)}
+          onClose={() => setDetailWork(null)}
+          onAdd={(media) => {
+            setDetailWork(null);
+            navigate(`/add?mediaId=${media.id}&title=${encodeURIComponent(media.title.native || media.title.romaji || media.title.english || '')}&from=discover`);
+          }}
+        />
+      )}
     </div>
   );
 }
