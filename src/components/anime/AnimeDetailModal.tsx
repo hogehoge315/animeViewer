@@ -208,8 +208,8 @@ export function AnimeDetailModal({ media, onClose, onAdd }: AnimeDetailModalProp
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  const displayTitle = media.title.english ?? media.title.romaji ?? media.title.native ?? 'Unknown';
-  const nativeTitle = media.title.native;
+  const displayTitle = media.title.native ?? media.title.romaji ?? media.title.english ?? 'Unknown';
+  const romajiTitle = media.title.romaji && media.title.romaji !== displayTitle ? media.title.romaji : null;
   const coverSrc = media.coverImage?.large ?? media.coverImage?.medium ?? null;
   const studios = media.studios?.nodes ?? [];
   const genres = media.genres ?? [];
@@ -239,8 +239,8 @@ export function AnimeDetailModal({ media, onClose, onAdd }: AnimeDetailModalProp
 
           <div>
             <h2 style={titleStyle}>{displayTitle}</h2>
-            {nativeTitle && nativeTitle !== displayTitle && (
-              <p style={subtitleStyle}>{nativeTitle}</p>
+            {romajiTitle && (
+              <p style={subtitleStyle}>{romajiTitle}</p>
             )}
           </div>
 
