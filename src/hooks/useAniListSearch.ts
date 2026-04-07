@@ -25,20 +25,28 @@ export function useAniListSearch(debounceMs: number = 500) {
     }
 
       setLoading(true);
-      timerRef.current = setTimeout(async () => {
-        const data = await queryAniList<AniListPageResult>(SEARCH_ANIME_QUERY, {
-          search: query.trim(),
-        perPage: 10,
-      });
-      if (data) {
-        setResults(data.Page.media);
-        setError(null);
-      } else {
-        setResults([]);
-        setError('検索に失敗しました');
-      }
-      setLoading(false);
-    }, debounceMs);
+      timerRef.current = setTimeout(() => {
+        void (async () => {
+          try {
+            const data = await queryAniList<AniListPageResult>(SEARCH_ANIME_QUERY, {
+              search: query.trim(),
+              perPage: 10,
+            });
+            if (data) {
+              setResults(data.Page.media);
+              setError(null);
+            } else {
+              setResults([]);
+              setError('検索に失敗しました');
+            }
+          } catch {
+            setResults([]);
+            setError('検索に失敗しました');
+          } finally {
+            setLoading(false);
+          }
+        })();
+      }, debounceMs);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -68,39 +76,41 @@ export function useVoiceActorSearch(debounceMs: number = 500) {
       }
 
       setLoading(true);
-      timerRef.current = setTimeout(async () => {
-        const staffResults: StaffWithWorks[] = [];
-        let page = 1;
-        let hasNextPage = true;
+      timerRef.current = setTimeout(() => {
+        void (async () => {
+          try {
+            const staffResults: StaffWithWorks[] = [];
+            let page = 1;
+            let hasNextPage = true;
 
-        while (hasNextPage && page <= MAX_VOICE_ACTOR_RESULT_PAGES) {
-          const data = await queryAniList<AniListStaffPageResult>(SEARCH_BY_VOICE_ACTOR_QUERY, {
-            search: searchQuery.trim(),
-            page,
-            perPage: 20,
-            worksPerPage: 100,
-          });
+            while (hasNextPage && page <= MAX_VOICE_ACTOR_RESULT_PAGES) {
+              const data = await queryAniList<AniListStaffPageResult>(SEARCH_BY_VOICE_ACTOR_QUERY, {
+                search: searchQuery.trim(),
+                page,
+                perPage: 20,
+                worksPerPage: 50,
+              });
 
-          if (!data) {
+              if (!data) {
+                setResults([]);
+                setError('検索に失敗しました');
+                return;
+              }
+
+              staffResults.push(...data.Page.staff.map(adaptStaffResult));
+              hasNextPage = data.Page.pageInfo.hasNextPage;
+              page += 1;
+            }
+
+            setResults(staffResults);
+            setError(null);
+          } catch {
             setResults([]);
             setError('検索に失敗しました');
+          } finally {
             setLoading(false);
-            return;
           }
-
-          staffResults.push(...data.Page.staff.map(adaptStaffResult));
-          hasNextPage = data.Page.pageInfo.hasNextPage;
-          page += 1;
-        }
-
-        if (staffResults.length > 0) {
-          setResults(staffResults);
-          setError(null);
-        } else {
-          setResults([]);
-          setError(null);
-        }
-        setLoading(false);
+        })();
       }, debounceMs);
     },
     [debounceMs]

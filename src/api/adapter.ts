@@ -25,7 +25,7 @@ export function extractVoiceActors(media: AniListMedia): VoiceActor[] {
   const actors: VoiceActor[] = [];
 
   for (const edge of media.characters.edges) {
-    for (const va of edge.voiceActors) {
+    for (const va of (edge.voiceActors ?? [])) {
       if (!seen.has(va.id)) {
         seen.add(va.id);
         actors.push({
