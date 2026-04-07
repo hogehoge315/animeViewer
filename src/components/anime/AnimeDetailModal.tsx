@@ -8,10 +8,6 @@ interface AnimeDetailModalProps {
   onAdd: (media: AniListMedia) => void;
 }
 
-function stripHtml(text: string): string {
-  return text.replace(/<[^>]*>/g, '').trim();
-}
-
 function getLinkIcon(link: AniListExternalLink): string {
   const site = link.site.toLowerCase();
 
@@ -132,13 +128,6 @@ const sectionLabelStyle: CSSProperties = {
   marginBottom: '4px',
 };
 
-const descriptionStyle: CSSProperties = {
-  fontSize: '14px',
-  color: '#1f2937',
-  lineHeight: 1.6,
-  margin: 0,
-};
-
 const metaStyle: CSSProperties = {
   fontSize: '13px',
   color: '#6b7280',
@@ -165,19 +154,19 @@ const linksRowStyle: CSSProperties = {
   gap: '8px',
 };
 
-const linkButtonStyle: CSSProperties = {
-  width: '36px',
-  height: '36px',
-  borderRadius: '8px',
+const linkBadgeStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '5px',
+  padding: '5px 10px',
+  borderRadius: '9999px',
   border: '1px solid #e5e7eb',
   backgroundColor: '#f9fafb',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: '14px',
-  fontWeight: 700,
+  fontSize: '13px',
+  fontWeight: 500,
   cursor: 'pointer',
   textDecoration: 'none',
+  whiteSpace: 'nowrap',
 };
 
 const addButtonStyle: CSSProperties = {
@@ -208,7 +197,6 @@ export function AnimeDetailModal({ media, onClose, onAdd }: AnimeDetailModalProp
   const studios = media.studios?.nodes ?? [];
   const genres = media.genres ?? [];
   const externalLinks = media.externalLinks ?? [];
-  const description = media.description ? stripHtml(media.description) : null;
 
   return (
     <div style={overlayStyle} onClick={onClose}>
@@ -261,13 +249,6 @@ export function AnimeDetailModal({ media, onClose, onAdd }: AnimeDetailModalProp
             </div>
           )}
 
-          {description && (
-            <div>
-              <div style={sectionLabelStyle}>あらすじ</div>
-              <p style={descriptionStyle}>{description}</p>
-            </div>
-          )}
-
           {externalLinks.length > 0 && (
             <div>
               <div style={sectionLabelStyle}>リンク</div>
@@ -278,14 +259,13 @@ export function AnimeDetailModal({ media, onClose, onAdd }: AnimeDetailModalProp
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    title={getLinkLabel(link)}
-                    aria-label={getLinkLabel(link)}
                     style={{
-                      ...linkButtonStyle,
+                      ...linkBadgeStyle,
                       color: link.color ?? '#6b7280',
                     }}
                   >
-                    {getLinkIcon(link)}
+                    <span>{getLinkIcon(link)}</span>
+                    <span>{getLinkLabel(link)}</span>
                   </a>
                 ))}
               </div>
