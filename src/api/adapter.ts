@@ -1,12 +1,21 @@
 import type { VoiceActor } from '../domain/types.ts';
 import type { AniListMedia, AniListStaff } from './anilist/types.ts';
 
+const CHARACTER_NAME_SEPARATOR = ' / ';
+
 export function extractTitle(media: AniListMedia): string {
   return media.title.native || media.title.romaji || media.title.english || 'Unknown';
 }
 
 export function extractCoverImage(media: AniListMedia): string | undefined {
   return media.coverImage?.large || media.coverImage?.medium || undefined;
+}
+
+export function extractEpisodeCount(media: AniListMedia): number | undefined {
+  if (typeof media.episodes !== 'number' || !Number.isFinite(media.episodes) || media.episodes <= 0) {
+    return undefined;
+  }
+  return Math.floor(media.episodes);
 }
 
 export function extractVoiceActors(media: AniListMedia): VoiceActor[] {
@@ -21,14 +30,19 @@ export function extractVoiceActors(media: AniListMedia): VoiceActor[] {
         seen.add(va.id);
         actors.push({
           id: va.id,
-          name: va.name.full || 'Unknown',
-          nameNative: va.name.native || undefined,
+          name: va.name.native || va.name.full || 'Unknown',
+          nameNative:
+            va.name.full && va.name.full !== va.name.native
+              ? va.name.full
+              : undefined,
         });
       }
     }
   }
   return actors;
 }
+
+export type CharacterRole = 'MAIN' | 'SUPPORTING' | 'BACKGROUND';
 
 export interface StaffWithWorks {
   id: number;
@@ -38,24 +52,73 @@ export interface StaffWithWorks {
     mediaId: number;
     title: string;
     coverImage?: string;
+    totalEpisodes?: number;
     genres: string[];
+    characterName?: string;
+    characterRole?: CharacterRole;
+    characterImage?: string;
   }>;
 }
 
 export function adaptStaffResult(staff: AniListStaff): StaffWithWorks {
+  const works = new Map<number, StaffWithWorks['works'][number]>();
+
+  for (const edge of staff.staffMedia.edges) {
+    const title =
+      edge.node.title.native ||
+      edge.node.title.romaji ||
+      edge.node.title.english ||
+      'Unknown';
+    const characterName =
+      edge.characterName ||
+      edge.character?.name.native ||
+      edge.character?.name.full ||
+      undefined;
+    const existing = works.get(edge.node.id);
+
+    if (existing) {
+      const existingCharacterNames = new Set(
+        (existing.characterName || '')
+          .split(CHARACTER_NAME_SEPARATOR)
+          .map((name) => name.trim())
+          .filter(Boolean)
+      );
+      if (characterName && !existingCharacterNames.has(characterName)) {
+        existing.characterName = existing.characterName
+          ? `${existing.characterName}${CHARACTER_NAME_SEPARATOR}${characterName}`
+          : characterName;
+      }
+      if (!existing.characterImage) {
+        existing.characterImage = edge.character?.image?.large || undefined;
+      }
+      if (
+        edge.characterRole === 'MAIN' ||
+        (!existing.characterRole && edge.characterRole)
+      ) {
+        existing.characterRole = edge.characterRole || existing.characterRole;
+      }
+      continue;
+    }
+
+    works.set(edge.node.id, {
+      mediaId: edge.node.id,
+      title,
+      coverImage: edge.node.coverImage?.large || edge.node.coverImage?.medium || undefined,
+      totalEpisodes: extractEpisodeCount(edge.node),
+      genres: edge.node.genres || [],
+      characterName,
+      characterRole: edge.characterRole || undefined,
+      characterImage: edge.character?.image?.large || undefined,
+    });
+  }
+
   return {
     id: staff.id,
-    name: staff.name.full || 'Unknown',
-    nameNative: staff.name.native || undefined,
-    works: staff.staffMedia.edges.map((edge) => ({
-      mediaId: edge.node.id,
-      title:
-        edge.node.title.native ||
-        edge.node.title.romaji ||
-        edge.node.title.english ||
-        'Unknown',
-      coverImage: edge.node.coverImage?.large || edge.node.coverImage?.medium || undefined,
-      genres: edge.node.genres || [],
-    })),
+    name: staff.name.native || staff.name.full || 'Unknown',
+    nameNative:
+      staff.name.full && staff.name.full !== staff.name.native
+        ? staff.name.full
+        : undefined,
+    works: Array.from(works.values()),
   };
 }

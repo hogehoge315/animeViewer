@@ -52,6 +52,8 @@ export function DetailPage() {
       rating: data.rating,
       comment: data.comment || undefined,
       watchStatus: data.watchStatus,
+      totalEpisodes: data.totalEpisodes,
+      watchedEpisodes: data.watchedEpisodes,
       voiceActors: data.voiceActors,
       genres: data.genres,
       coverImage: data.coverImage,
@@ -74,13 +76,15 @@ export function DetailPage() {
           initial={{
             title: entry.title,
             season: entry.season,
-            rating: entry.rating,
-            comment: entry.comment || '',
-            watchStatus: entry.watchStatus,
-            anilistMediaId: entry.anilistMediaId,
-            voiceActors: entry.voiceActors,
-            genres: entry.genres,
-            coverImage: entry.coverImage,
+             rating: entry.rating,
+             comment: entry.comment || '',
+             watchStatus: entry.watchStatus,
+             anilistMediaId: entry.anilistMediaId,
+             totalEpisodes: entry.totalEpisodes,
+             watchedEpisodes: entry.watchedEpisodes,
+             voiceActors: entry.voiceActors,
+             genres: entry.genres,
+             coverImage: entry.coverImage,
           }}
           onSubmit={handleUpdate}
           submitLabel="更新する"
@@ -126,6 +130,11 @@ export function DetailPage() {
           <div style={{ color: '#6b7280', fontSize: '14px', marginBottom: '8px' }}>{entry.season}</div>
           <StarRating value={entry.rating} readonly size={20} />
           <div style={{ marginTop: '8px' }}><StatusBadge status={entry.watchStatus} /></div>
+          {entry.totalEpisodes !== undefined && (
+            <div style={{ color: '#6b7280', fontSize: '13px', marginTop: '8px' }}>
+              視聴話数: {entry.watchedEpisodes ?? 0} / {entry.totalEpisodes}
+            </div>
+          )}
         </div>
       </div>
 

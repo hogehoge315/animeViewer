@@ -40,12 +40,32 @@ const actionBtnStyle: CSSProperties = {
   flexShrink: 0,
 };
 
+const roleBadgeStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '20px',
+  height: '20px',
+  borderRadius: '9999px',
+  backgroundColor: '#f9a8d4',
+  color: '#fff',
+  fontSize: '11px',
+  fontWeight: 700,
+  flexShrink: 0,
+};
+
 export function VoiceActorSearchPage() {
   const navigate = useNavigate();
   const { query, search, results, loading, error } = useVoiceActorSearch();
   const { entries } = useAnimeEntries();
 
   const existingMediaIds = new Set(entries.filter((e) => e.anilistMediaId).map((e) => e.anilistMediaId));
+  const getRoleIcon = (role?: (typeof results)[number]['works'][number]['characterRole']) => {
+    if (role === 'MAIN') return 'メ';
+    if (role === 'SUPPORTING') return 'サ';
+    if (role === 'BACKGROUND') return '背';
+    return null;
+  };
 
   return (
     <div style={containerStyle}>
@@ -96,18 +116,33 @@ export function VoiceActorSearchPage() {
 
               return (
                 <div key={work.mediaId} style={workCardStyle}>
-                  {work.coverImage ? (
-                    <img src={work.coverImage} alt="" style={thumbStyle} />
+                  {work.characterImage || work.coverImage ? (
+                    <img src={work.characterImage || work.coverImage} alt="" style={thumbStyle} />
                   ) : (
                     <div style={thumbStyle} />
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
+                    {(work.characterName || work.characterRole) && (
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '2px' }}>
+                        {getRoleIcon(work.characterRole) && (
+                          <span style={roleBadgeStyle}>{getRoleIcon(work.characterRole)}</span>
+                        )}
+                        <div style={{ color: '#ec4899', fontSize: '12px', fontWeight: 600 }}>
+                          {work.characterName || 'キャラクター名不明'}
+                        </div>
+                      </div>
+                    )}
                     <div style={{ color: '#1f2937', fontSize: '14px', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {work.title}
                     </div>
                     <div style={{ color: '#9ca3af', fontSize: '11px' }}>
                       {work.genres.slice(0, 3).join(', ')}
                     </div>
+                    {work.totalEpisodes !== undefined && (
+                      <div style={{ color: '#9ca3af', fontSize: '11px', marginTop: '2px' }}>
+                        全{work.totalEpisodes}話
+                      </div>
+                    )}
                   </div>
                   {isExisting && existingEntry ? (
                     <button

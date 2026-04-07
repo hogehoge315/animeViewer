@@ -6,6 +6,8 @@ export interface CreateAnimeInput {
   title: string;
   season: string;
   anilistMediaId?: number;
+  totalEpisodes?: number;
+  watchedEpisodes?: number;
   rating?: number;
   comment?: string;
   watchStatus: WatchStatus;
@@ -14,13 +16,36 @@ export interface CreateAnimeInput {
   coverImage?: string;
 }
 
+function normalizeEpisodes(
+  totalEpisodes?: number,
+  watchedEpisodes?: number
+): Pick<AnimeEntry, 'totalEpisodes' | 'watchedEpisodes'> {
+  const total =
+    typeof totalEpisodes === 'number' && Number.isFinite(totalEpisodes) && totalEpisodes > 0
+      ? Math.floor(totalEpisodes)
+      : undefined;
+  const watched =
+    typeof watchedEpisodes === 'number' && Number.isFinite(watchedEpisodes) && watchedEpisodes >= 0
+      ? Math.floor(watchedEpisodes)
+      : undefined;
+
+  return {
+    totalEpisodes: total,
+    watchedEpisodes:
+      watched === undefined || total === undefined ? watched : Math.min(watched, total),
+  };
+}
+
 export function addAnime(input: CreateAnimeInput): AnimeEntry {
   const now = new Date().toISOString();
+  const progress = normalizeEpisodes(input.totalEpisodes, input.watchedEpisodes);
   const entry: AnimeEntry = {
     id: generateId(),
     title: input.title,
     season: input.season,
     anilistMediaId: input.anilistMediaId,
+    totalEpisodes: progress.totalEpisodes,
+    watchedEpisodes: progress.watchedEpisodes,
     rating: input.rating,
     comment: input.comment,
     watchStatus: input.watchStatus,
@@ -35,7 +60,18 @@ export function addAnime(input: CreateAnimeInput): AnimeEntry {
 }
 
 export function updateAnime(id: string, updates: Partial<AnimeEntry>): AnimeEntry | undefined {
-  return repository.update(id, updates);
+  const current = repository.getById(id);
+  if (!current) return undefined;
+
+  const nextTotalEpisodes = updates.totalEpisodes ?? current.totalEpisodes;
+  const nextWatchedEpisodes = updates.watchedEpisodes ?? current.watchedEpisodes;
+  const progress = normalizeEpisodes(nextTotalEpisodes, nextWatchedEpisodes);
+
+  return repository.update(id, {
+    ...updates,
+    totalEpisodes: progress.totalEpisodes,
+    watchedEpisodes: progress.watchedEpisodes,
+  });
 }
 
 export function deleteAnime(id: string): boolean {

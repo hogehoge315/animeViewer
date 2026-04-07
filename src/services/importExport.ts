@@ -1,7 +1,7 @@
 import type { AnimeEntry, ExportData, WatchStatus } from '../domain/types.ts';
 
 const APP_VERSION = '0.1.0';
-const CURRENT_SCHEMA_VERSION = 1;
+const CURRENT_SCHEMA_VERSION = 2;
 
 export function exportToJSON(entries: AnimeEntry[]): ExportData {
   return {

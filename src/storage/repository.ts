@@ -2,7 +2,7 @@ import type { AnimeEntry, StorageSchema } from '../domain/types.ts';
 import { migrate } from './migration.ts';
 
 const STORAGE_KEY = 'anime-viewer-data';
-const CURRENT_SCHEMA_VERSION = 1;
+const CURRENT_SCHEMA_VERSION = 2;
 const APP_VERSION = '0.1.0';
 
 function loadSchema(): StorageSchema {

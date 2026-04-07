@@ -11,6 +11,8 @@ export interface AnimeFormData {
   comment: string;
   watchStatus: WatchStatus;
   anilistMediaId?: number;
+  totalEpisodes?: number;
+  watchedEpisodes?: number;
   voiceActors: VoiceActor[];
   genres: string[];
   coverImage?: string;
@@ -60,13 +62,32 @@ export function AnimeForm({ initial, onSubmit, submitLabel = '保存' }: AnimeFo
   const [rating, setRating] = useState<number | undefined>(initial?.rating);
   const [comment, setComment] = useState(initial?.comment || '');
   const [watchStatus, setWatchStatus] = useState<WatchStatus>(initial?.watchStatus || 'plan_to_watch');
+  const [totalEpisodes, setTotalEpisodes] = useState<number | undefined>(initial?.totalEpisodes);
+  const [watchedEpisodes, setWatchedEpisodes] = useState<number | undefined>(initial?.watchedEpisodes);
   const [errors, setErrors] = useState<string[]>([]);
+
+  const parseEpisodeValue = (value: string): number | undefined => {
+    if (!value.trim()) return undefined;
+    const parsed = Number(value);
+    if (parsed < 0 || !Number.isFinite(parsed)) return undefined;
+    return Math.floor(parsed);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const errs: string[] = [];
+    const normalizedTotalEpisodes =
+      totalEpisodes !== undefined && totalEpisodes > 0 ? Math.floor(totalEpisodes) : undefined;
+    const normalizedWatchedEpisodes = watchedEpisodes !== undefined ? Math.max(0, Math.floor(watchedEpisodes)) : undefined;
     if (!title.trim()) errs.push('タイトルは必須です');
     if (!season.trim()) errs.push('シーズンは必須です');
+    if (
+      normalizedTotalEpisodes !== undefined &&
+      normalizedWatchedEpisodes !== undefined &&
+      normalizedWatchedEpisodes > normalizedTotalEpisodes
+    ) {
+      errs.push('視聴済み話数は総話数以下にしてください');
+    }
     if (errs.length > 0) {
       setErrors(errs);
       return;
@@ -79,6 +100,8 @@ export function AnimeForm({ initial, onSubmit, submitLabel = '保存' }: AnimeFo
       comment: comment.trim(),
       watchStatus,
       anilistMediaId: initial?.anilistMediaId,
+      totalEpisodes: normalizedTotalEpisodes,
+      watchedEpisodes: normalizedWatchedEpisodes,
       voiceActors: initial?.voiceActors || [],
       genres: initial?.genres || [],
       coverImage: initial?.coverImage,
@@ -135,6 +158,30 @@ export function AnimeForm({ initial, onSubmit, submitLabel = '保存' }: AnimeFo
             <option key={val} value={val}>{label}</option>
           ))}
         </select>
+      </div>
+
+      <div style={fieldGroupStyle}>
+        <label style={labelStyle}>総話数</label>
+        <input
+          type="number"
+          min="0"
+          value={totalEpisodes ?? ''}
+          onChange={(e) => setTotalEpisodes(parseEpisodeValue(e.target.value))}
+          style={inputStyle}
+          placeholder="AniListから自動入力 / 手動入力"
+        />
+      </div>
+
+      <div style={fieldGroupStyle}>
+        <label style={labelStyle}>視聴済み話数</label>
+        <input
+          type="number"
+          min="0"
+          value={watchedEpisodes ?? ''}
+          onChange={(e) => setWatchedEpisodes(parseEpisodeValue(e.target.value))}
+          style={inputStyle}
+          placeholder="0"
+        />
       </div>
 
       <div style={fieldGroupStyle}>

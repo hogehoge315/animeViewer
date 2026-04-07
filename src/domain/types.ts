@@ -29,6 +29,8 @@ export interface AnimeEntry {
   season: string;
   title: string;
   anilistMediaId?: number;
+  totalEpisodes?: number;
+  watchedEpisodes?: number;
   rating?: number;
   comment?: string;
   watchStatus: WatchStatus;

@@ -29,6 +29,7 @@ export interface AniListMedia {
   id: number;
   title: AniListTitle;
   coverImage: AniListCoverImage | null;
+  episodes?: number | null;
   genres: string[] | null;
   characters?: AniListCharacters;
 }
@@ -39,11 +40,40 @@ export interface AniListPageResult {
   };
 }
 
+export interface AniListMediaByIdResult {
+  Media: AniListMedia | null;
+}
+
+export interface AniListPageInfo {
+  hasNextPage: boolean;
+  currentPage: number;
+  lastPage: number;
+}
+
+export interface AniListCharacterRoleName {
+  full: string | null;
+  native: string | null;
+}
+
+export interface AniListCharacterRoleImage {
+  large: string | null;
+}
+
+export interface AniListStaffCharacterRole {
+  id: number;
+  name: AniListCharacterRoleName;
+  image: AniListCharacterRoleImage | null;
+}
+
 export interface AniListStaffCharacterMediaEdge {
+  characterRole?: 'MAIN' | 'SUPPORTING' | 'BACKGROUND' | null;
+  characterName?: string | null;
+  character?: AniListStaffCharacterRole | null;
   node: {
     id: number;
     title: AniListTitle;
     coverImage: AniListCoverImage | null;
+    episodes?: number | null;
     genres: string[] | null;
   };
 }
@@ -61,6 +91,7 @@ export interface AniListStaff {
 
 export interface AniListStaffPageResult {
   Page: {
+    pageInfo: AniListPageInfo;
     staff: AniListStaff[];
   };
 }
