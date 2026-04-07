@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAnimeEntries } from '../hooks/useAnimeEntries.ts';
 import { useAniListSearch, useVoiceActorSearch } from '../hooks/useAniListSearch.ts';
-import { extractTitle, extractCoverImage, extractVoiceActors } from '../api/adapter.ts';
+import { extractTitle, extractCoverImage, extractEpisodeCount, extractVoiceActors } from '../api/adapter.ts';
 import type { StaffWithWorks } from '../api/adapter.ts';
-import type { AniListMedia } from '../api/anilist/types.ts';
+import type { AniListMedia, AniListMediaByIdResult } from '../api/anilist/types.ts';
+import { queryAniList } from '../api/anilist/client.ts';
+import { SEARCH_ANIME_BY_ID_QUERY } from '../api/anilist/queries.ts';
 import type { VoiceActor } from '../domain/types.ts';
 import { AnimeForm } from '../components/anime/AnimeForm.tsx';
 import type { AnimeFormData } from '../components/anime/AnimeForm.tsx';
@@ -37,6 +39,27 @@ const thumbStyle: CSSProperties = {
   flexShrink: 0,
 };
 
+const searchResultButtonStyle: CSSProperties = {
+  ...searchResultStyle,
+  width: '100%',
+  textAlign: 'left',
+  border: '1px solid #fbcfe8',
+};
+
+const roleBadgeStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '20px',
+  height: '20px',
+  borderRadius: '9999px',
+  backgroundColor: '#f9a8d4',
+  color: '#fff',
+  fontSize: '11px',
+  fontWeight: 700,
+  flexShrink: 0,
+};
+
 type SearchMode = 'anime' | 'voiceActor';
 
 interface SelectionInfo {
@@ -48,6 +71,7 @@ interface SelectionInfo {
 
 export function AddAnimePage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { addEntry } = useAnimeEntries();
   const { query, setQuery, results, loading, error } = useAniListSearch();
   const { query: vaQuery, search: vaSearch, results: vaResults, loading: vaLoading, error: vaError } = useVoiceActorSearch();
@@ -55,6 +79,14 @@ export function AddAnimePage() {
   const [showSearch, setShowSearch] = useState(true);
   const [searchMode, setSearchMode] = useState<SearchMode>('anime');
   const [selection, setSelection] = useState<SelectionInfo | null>(null);
+  const [prefillError, setPrefillError] = useState<string | null>(null);
+
+  const getRoleIcon = (role?: StaffWithWorks['works'][number]['characterRole']) => {
+    if (role === 'MAIN') return 'メ';
+    if (role === 'SUPPORTING') return 'サ';
+    if (role === 'BACKGROUND') return '背';
+    return null;
+  };
 
   const handleSelectAnime = (media: AniListMedia) => {
     setSelection({
@@ -64,6 +96,8 @@ export function AddAnimePage() {
       formData: {
         title: extractTitle(media),
         coverImage: extractCoverImage(media),
+        totalEpisodes: extractEpisodeCount(media),
+        watchedEpisodes: 0,
         voiceActors: extractVoiceActors(media),
         genres: media.genres || [],
         anilistMediaId: media.id,
@@ -81,6 +115,8 @@ export function AddAnimePage() {
       formData: {
         title: work.title,
         coverImage: work.coverImage,
+        totalEpisodes: work.totalEpisodes,
+        watchedEpisodes: 0,
         voiceActors: [voiceActor],
         genres: work.genres,
         anilistMediaId: work.mediaId,
@@ -88,6 +124,56 @@ export function AddAnimePage() {
     });
     setShowSearch(false);
   };
+
+  useEffect(() => {
+    const mediaIdParam = searchParams.get('mediaId');
+    if (!mediaIdParam) {
+      setPrefillError(null);
+      return;
+    }
+
+    const mediaId = Number(mediaIdParam);
+    if (!Number.isFinite(mediaId)) {
+      setPrefillError('アニメ情報の取得に失敗しました');
+      return;
+    }
+
+    let cancelled = false;
+
+    const prefillSelection = async () => {
+      const data = await queryAniList<AniListMediaByIdResult>(SEARCH_ANIME_BY_ID_QUERY, {
+        id: mediaId,
+      });
+
+      if (cancelled) return;
+
+      if (data?.Media) {
+        handleSelectAnime(data.Media);
+        setPrefillError(null);
+        return;
+      }
+
+      const fallbackTitle = searchParams.get('title') || '';
+      setSelection({
+        title: fallbackTitle || '作品を追加',
+        genres: [],
+        formData: {
+          title: fallbackTitle,
+          anilistMediaId: mediaId,
+          voiceActors: [],
+          genres: [],
+        },
+      });
+      setShowSearch(false);
+      setPrefillError('作品情報の一部を取得できなかったため、タイトルのみ入力済みにしました');
+    };
+
+    void prefillSelection();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [searchParams]);
 
   const handleSubmit = (data: AnimeFormData) => {
     addEntry({
@@ -97,6 +183,8 @@ export function AddAnimePage() {
       comment: data.comment || undefined,
       watchStatus: data.watchStatus,
       anilistMediaId: data.anilistMediaId,
+      totalEpisodes: data.totalEpisodes,
+      watchedEpisodes: data.watchedEpisodes,
       voiceActors: data.voiceActors,
       genres: data.genres,
       coverImage: data.coverImage,
@@ -155,27 +243,34 @@ export function AddAnimePage() {
                 loading={loading}
               />
               {error && <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>{error}</div>}
+              {prefillError && <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>{prefillError}</div>}
 
               {results.length > 0 && (
                 <div style={{ marginTop: '8px', maxHeight: '300px', overflowY: 'auto' }}>
                   {results.map((media) => (
-                    <div
+                    <button
+                      type="button"
                       key={media.id}
-                      style={searchResultStyle}
+                      style={searchResultButtonStyle}
                       onClick={() => handleSelectAnime(media)}
                     >
                       {media.coverImage?.medium && (
                         <img src={media.coverImage.medium} alt="" style={thumbStyle} />
                       )}
-                      <div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ color: '#1f2937', fontSize: '14px', fontWeight: 600 }}>
                           {extractTitle(media)}
                         </div>
                         <div style={{ color: '#6b7280', fontSize: '12px' }}>
                           {(media.genres || []).slice(0, 3).join(', ')}
                         </div>
+                        {extractEpisodeCount(media) !== undefined && (
+                          <div style={{ color: '#9ca3af', fontSize: '11px', marginTop: '2px' }}>
+                            全{extractEpisodeCount(media)}話
+                          </div>
+                        )}
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}
@@ -212,25 +307,43 @@ export function AddAnimePage() {
                     )}
                     <div>
                       {staff.works.map((work) => (
-                        <div
+                        <button
+                          type="button"
                           key={work.mediaId}
-                          style={searchResultStyle}
+                          style={searchResultButtonStyle}
                           onClick={() => handleSelectWork(work, staff)}
                         >
-                          {work.coverImage ? (
+                          {work.characterImage ? (
+                            <img src={work.characterImage} alt="" style={thumbStyle} />
+                          ) : work.coverImage ? (
                             <img src={work.coverImage} alt="" style={thumbStyle} />
                           ) : (
                             <div style={{ ...thumbStyle, backgroundColor: '#fce7f3' }} />
                           )}
-                          <div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            {(work.characterName || work.characterRole) && (
+                              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '2px' }}>
+                                {getRoleIcon(work.characterRole) && (
+                                  <span style={roleBadgeStyle}>{getRoleIcon(work.characterRole)}</span>
+                                )}
+                                <div style={{ color: '#ec4899', fontSize: '12px', fontWeight: 600 }}>
+                                  {work.characterName || 'キャラクター名不明'}
+                                </div>
+                              </div>
+                            )}
                             <div style={{ color: '#1f2937', fontSize: '14px', fontWeight: 600 }}>
                               {work.title}
                             </div>
                             <div style={{ color: '#6b7280', fontSize: '12px' }}>
                               {(work.genres || []).slice(0, 3).join(', ')}
                             </div>
+                            {work.totalEpisodes !== undefined && (
+                              <div style={{ color: '#9ca3af', fontSize: '11px', marginTop: '2px' }}>
+                                全{work.totalEpisodes}話
+                              </div>
+                            )}
                           </div>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -263,10 +376,15 @@ export function AddAnimePage() {
           {selection.image && (
             <img src={selection.image} alt="" style={{ width: '60px', height: '85px', objectFit: 'cover', borderRadius: '6px' }} />
           )}
-          <div>
-            <div style={{ color: '#1f2937', fontWeight: 600 }}>{selection.title}</div>
-            <div style={{ color: '#6b7280', fontSize: '12px' }}>{selection.genres.join(', ')}</div>
-          </div>
+            <div>
+              <div style={{ color: '#1f2937', fontWeight: 600 }}>{selection.title}</div>
+              <div style={{ color: '#6b7280', fontSize: '12px' }}>{selection.genres.join(', ')}</div>
+              {selection.formData.totalEpisodes !== undefined && (
+                <div style={{ color: '#9ca3af', fontSize: '11px', marginTop: '2px' }}>
+                  全{selection.formData.totalEpisodes}話
+                </div>
+              )}
+            </div>
           <button
             type="button"
             onClick={() => { setSelection(null); setShowSearch(true); }}

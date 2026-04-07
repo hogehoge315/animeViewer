@@ -49,7 +49,7 @@ const emptyStyle: CSSProperties = {
 const statuses = Object.entries(WATCH_STATUS_LABELS) as [WatchStatus, string][];
 
 export function HomePage() {
-  const { entries, loading } = useAnimeEntries();
+  const { entries, loading, updateEntry } = useAnimeEntries();
   const [filters, setFilters] = useState<FilterOptions>({});
 
   const seasons = useMemo(() => getUniqueSeasons(entries), [entries]);
@@ -151,7 +151,11 @@ export function HomePage() {
       ) : (
         <div style={gridStyle}>
           {filtered.map((entry) => (
-            <AnimeCard key={entry.id} entry={entry} />
+            <AnimeCard
+              key={entry.id}
+              entry={entry}
+              onProgressCommit={(watchedEpisodes) => updateEntry(entry.id, { watchedEpisodes })}
+            />
           ))}
         </div>
       )}

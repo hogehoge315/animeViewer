@@ -22,10 +22,10 @@ export function useAniListSearch(debounceMs: number = 500) {
       return;
     }
 
-    setLoading(true);
-    timerRef.current = setTimeout(async () => {
-      const data = await queryAniList<AniListPageResult>(SEARCH_ANIME_QUERY, {
-        search: query.trim(),
+      setLoading(true);
+      timerRef.current = setTimeout(async () => {
+        const data = await queryAniList<AniListPageResult>(SEARCH_ANIME_QUERY, {
+          search: query.trim(),
         perPage: 10,
       });
       if (data) {
@@ -67,15 +67,36 @@ export function useVoiceActorSearch(debounceMs: number = 500) {
 
       setLoading(true);
       timerRef.current = setTimeout(async () => {
-        const data = await queryAniList<AniListStaffPageResult>(SEARCH_BY_VOICE_ACTOR_QUERY, {
-          search: searchQuery.trim(),
-        });
-        if (data) {
-          setResults(data.Page.staff.map(adaptStaffResult));
+        const staffResults: StaffWithWorks[] = [];
+        let page = 1;
+        let hasNextPage = true;
+
+        while (hasNextPage) {
+          const data = await queryAniList<AniListStaffPageResult>(SEARCH_BY_VOICE_ACTOR_QUERY, {
+            search: searchQuery.trim(),
+            page,
+            perPage: 20,
+            worksPerPage: 100,
+          });
+
+          if (!data) {
+            setResults([]);
+            setError('検索に失敗しました');
+            setLoading(false);
+            return;
+          }
+
+          staffResults.push(...data.Page.staff.map(adaptStaffResult));
+          hasNextPage = data.Page.pageInfo.hasNextPage;
+          page += 1;
+        }
+
+        if (staffResults.length > 0) {
+          setResults(staffResults);
           setError(null);
         } else {
           setResults([]);
-          setError('検索に失敗しました');
+          setError(null);
         }
         setLoading(false);
       }, debounceMs);
