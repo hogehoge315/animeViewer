@@ -78,7 +78,7 @@ export function HomePage() {
     return Array.from(years).sort((a, b) => b - a);
   }, [entries]);
 
-  const [selectedYear, setSelectedYear] = useState<number>(allYears[0] ?? new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [selectedSeasonName, setSelectedSeasonName] = useState<string>('全');
 
   useEffect(() => {
