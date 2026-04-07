@@ -31,21 +31,22 @@ query SearchByVoiceActor($search: String!, $page: Int!, $perPage: Int!, $worksPe
     staff(search: $search) {
       id
       name { full native }
-      staffMedia(type: ANIME, sort: [POPULARITY_DESC], perPage: $worksPerPage) {
+      characters(sort: [FAVOURITES_DESC], perPage: $worksPerPage) {
         edges {
-          characterRole
-          characterName
-          character {
+          role
+          node {
             id
             name { full native }
             image { large }
-          }
-          node {
-            id
-            title { romaji english native }
-            coverImage { medium large }
-            episodes
-            genres
+            media(type: ANIME, sort: [POPULARITY_DESC], perPage: 5) {
+              nodes {
+                id
+                title { romaji english native }
+                coverImage { medium large }
+                episodes
+                genres
+              }
+            }
           }
         }
       }

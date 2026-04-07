@@ -106,6 +106,9 @@ export function AnimeCard({ entry, onProgressCommit }: AnimeCardProps) {
     setDraftWatchedEpisodes(clampedValue);
   };
 
+  const isMinReached = displayedWatchedEpisodes <= 0;
+  const isMaxReached = entry.totalEpisodes !== undefined && displayedWatchedEpisodes >= entry.totalEpisodes;
+
   return (
     <div style={cardStyle}>
       <Link to={`/anime/${entry.id}`} style={linkStyle}>
@@ -142,8 +145,8 @@ export function AnimeCard({ entry, onProgressCommit }: AnimeCardProps) {
             <button
               type="button"
               onClick={() => updateDraft(displayedWatchedEpisodes - 1)}
-              style={progressButtonStyle}
-              disabled={displayedWatchedEpisodes <= 0}
+              style={{ ...progressButtonStyle, ...(isMinReached ? { opacity: 0.4, cursor: 'not-allowed' } : {}) }}
+              disabled={isMinReached}
               aria-label={`${entry.title}の視聴済み話数を1話減らす`}
             >
               −
@@ -151,26 +154,25 @@ export function AnimeCard({ entry, onProgressCommit }: AnimeCardProps) {
             <button
               type="button"
               onClick={() => updateDraft(displayedWatchedEpisodes + 1)}
-              style={progressButtonStyle}
-              disabled={displayedWatchedEpisodes >= entry.totalEpisodes}
+              style={{ ...progressButtonStyle, ...(isMaxReached ? { opacity: 0.4, cursor: 'not-allowed' } : {}) }}
+              disabled={isMaxReached}
               aria-label={`${entry.title}の視聴済み話数を1話増やす`}
             >
               ＋
             </button>
-            {hasPendingProgressChange && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (draftWatchedEpisodes !== null) {
-                    onProgressCommit(draftWatchedEpisodes);
-                  }
-                }}
-                style={confirmButtonStyle}
-                aria-label={`${entry.title}の視聴済み話数の変更を確定する`}
-              >
-                ✓
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => {
+                if (draftWatchedEpisodes !== null) {
+                  onProgressCommit(draftWatchedEpisodes);
+                }
+              }}
+              style={{ ...confirmButtonStyle, visibility: hasPendingProgressChange ? 'visible' : 'hidden' }}
+              disabled={!hasPendingProgressChange}
+              aria-label={`${entry.title}の視聴済み話数の変更を確定する`}
+            >
+              ✓
+            </button>
           </div>
           <div style={{ ...metaStyle, textAlign: 'right' }}>話数更新</div>
         </div>

@@ -62,7 +62,7 @@ export function AnimeForm({ initial, onSubmit, submitLabel = '保存' }: AnimeFo
   const [rating, setRating] = useState<number | undefined>(initial?.rating);
   const [comment, setComment] = useState(initial?.comment || '');
   const [watchStatus, setWatchStatus] = useState<WatchStatus>(initial?.watchStatus || 'plan_to_watch');
-  const [totalEpisodes, setTotalEpisodes] = useState<number | undefined>(initial?.totalEpisodes);
+  const [totalEpisodes] = useState<number | undefined>(initial?.totalEpisodes);
   const [watchedEpisodes, setWatchedEpisodes] = useState<number | undefined>(initial?.watchedEpisodes);
   const [errors, setErrors] = useState<string[]>([]);
 
@@ -166,9 +166,8 @@ export function AnimeForm({ initial, onSubmit, submitLabel = '保存' }: AnimeFo
           type="number"
           min="0"
           value={totalEpisodes ?? ''}
-          onChange={(e) => setTotalEpisodes(parseEpisodeValue(e.target.value))}
-          style={inputStyle}
-          placeholder="AniListから自動入力 / 手動入力"
+          readOnly
+          style={{ ...inputStyle, backgroundColor: '#f9fafb', color: '#6b7280', cursor: 'default' }}
         />
       </div>
 
