@@ -9,13 +9,7 @@ interface AnimeDetailModalProps {
 }
 
 function stripHtml(text: string): string {
-  let result = text;
-  let previous = '';
-  while (result !== previous) {
-    previous = result;
-    result = result.replace(/<[^>]*>/g, '');
-  }
-  return result.trim();
+  return text.replace(/<[^>]*>/g, '').trim();
 }
 
 function getLinkIcon(link: AniListExternalLink): string {
@@ -258,7 +252,7 @@ export function AnimeDetailModal({ media, onClose, onAdd }: AnimeDetailModalProp
 
           {genres.length > 0 && (
             <div>
-              <div style={sectionLabelStyle}>Genres</div>
+              <div style={sectionLabelStyle}>ジャンル</div>
               <div style={genreContainerStyle}>
                 {genres.map((genre) => (
                   <span key={genre} style={genreTagStyle}>{genre}</span>
@@ -269,14 +263,14 @@ export function AnimeDetailModal({ media, onClose, onAdd }: AnimeDetailModalProp
 
           {description && (
             <div>
-              <div style={sectionLabelStyle}>Synopsis</div>
+              <div style={sectionLabelStyle}>あらすじ</div>
               <p style={descriptionStyle}>{description}</p>
             </div>
           )}
 
           {externalLinks.length > 0 && (
             <div>
-              <div style={sectionLabelStyle}>Links</div>
+              <div style={sectionLabelStyle}>リンク</div>
               <div style={linksRowStyle}>
                 {externalLinks.map((link) => (
                   <a
