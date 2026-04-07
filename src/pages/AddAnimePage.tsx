@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAnimeEntries } from '../hooks/useAnimeEntries.ts';
 import { useAniListSearch, useVoiceActorSearch } from '../hooks/useAniListSearch.ts';
-import { extractTitle, extractCoverImage, extractEpisodeCount, extractVoiceActors } from '../api/adapter.ts';
+import { extractTitle, extractCoverImage, extractEpisodeCount, extractVoiceActors, extractSeason } from '../api/adapter.ts';
 import type { StaffWithWorks } from '../api/adapter.ts';
 import type { AniListMedia, AniListMediaByIdResult } from '../api/anilist/types.ts';
 import { queryAniList } from '../api/anilist/client.ts';
@@ -101,6 +101,7 @@ export function AddAnimePage() {
         voiceActors: extractVoiceActors(media),
         genres: media.genres || [],
         anilistMediaId: media.id,
+        season: extractSeason(media),
       },
     });
     setShowSearch(false);
@@ -405,6 +406,8 @@ export function AddAnimePage() {
           initial={selection?.formData}
           onSubmit={handleSubmit}
           submitLabel="追加する"
+          fromApi={!!selection?.formData.anilistMediaId}
+          apiSeason={selection?.formData.season}
         />
       )}
     </div>

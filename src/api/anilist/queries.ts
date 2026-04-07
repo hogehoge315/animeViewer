@@ -7,6 +7,8 @@ query SearchAnime($search: String!, $perPage: Int) {
       coverImage { medium large }
       episodes
       genres
+      season
+      seasonYear
       characters(role: MAIN, sort: [RELEVANCE]) {
         edges {
           voiceActors(language: JAPANESE) {
@@ -63,6 +65,8 @@ query SearchAnimeById($id: Int!) {
     coverImage { medium large }
     episodes
     genres
+    season
+    seasonYear
     characters(role: MAIN, sort: [RELEVANCE]) {
       edges {
         voiceActors(language: JAPANESE) {
