@@ -55,7 +55,7 @@ export function adaptStaffResult(staff: AniListStaff): StaffWithWorks {
         edge.node.title.english ||
         'Unknown',
       coverImage: edge.node.coverImage?.large || edge.node.coverImage?.medium || undefined,
-      genres: edge.node.genres,
+      genres: edge.node.genres || [],
     })),
   };
 }

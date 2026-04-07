@@ -29,7 +29,7 @@ export interface AniListMedia {
   id: number;
   title: AniListTitle;
   coverImage: AniListCoverImage | null;
-  genres: string[];
+  genres: string[] | null;
   characters?: AniListCharacters;
 }
 
@@ -44,7 +44,7 @@ export interface AniListStaffCharacterMediaEdge {
     id: number;
     title: AniListTitle;
     coverImage: AniListCoverImage | null;
-    genres: string[];
+    genres: string[] | null;
   };
 }
 
