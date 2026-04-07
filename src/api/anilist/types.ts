@@ -59,23 +59,24 @@ export interface AniListCharacterRoleImage {
   large: string | null;
 }
 
-export interface AniListStaffCharacterRole {
+export interface AniListStaffCharacterNode {
   id: number;
   name: AniListCharacterRoleName;
   image: AniListCharacterRoleImage | null;
+  media: {
+    nodes: Array<{
+      id: number;
+      title: AniListTitle;
+      coverImage: AniListCoverImage | null;
+      episodes?: number | null;
+      genres: string[] | null;
+    }>;
+  };
 }
 
-export interface AniListStaffCharacterMediaEdge {
-  characterRole?: 'MAIN' | 'SUPPORTING' | 'BACKGROUND' | null;
-  characterName?: string | null;
-  character?: AniListStaffCharacterRole | null;
-  node: {
-    id: number;
-    title: AniListTitle;
-    coverImage: AniListCoverImage | null;
-    episodes?: number | null;
-    genres: string[] | null;
-  };
+export interface AniListStaffCharacterEdge {
+  role?: 'MAIN' | 'SUPPORTING' | 'BACKGROUND' | null;
+  node: AniListStaffCharacterNode;
 }
 
 export interface AniListStaff {
@@ -84,8 +85,8 @@ export interface AniListStaff {
     full: string | null;
     native: string | null;
   };
-  staffMedia: {
-    edges: AniListStaffCharacterMediaEdge[];
+  characters: {
+    edges: AniListStaffCharacterEdge[];
   };
 }
 

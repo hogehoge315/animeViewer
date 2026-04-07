@@ -63,53 +63,56 @@ export interface StaffWithWorks {
 export function adaptStaffResult(staff: AniListStaff): StaffWithWorks {
   const works = new Map<number, StaffWithWorks['works'][number]>();
 
-  for (const edge of staff.staffMedia.edges) {
-    const title =
-      edge.node.title.native ||
-      edge.node.title.romaji ||
-      edge.node.title.english ||
-      'Unknown';
+  for (const charEdge of staff.characters.edges) {
     const characterName =
-      edge.characterName ||
-      edge.character?.name.native ||
-      edge.character?.name.full ||
-      undefined;
-    const existing = works.get(edge.node.id);
+      charEdge.node.name.native || charEdge.node.name.full || undefined;
+    const characterImage = charEdge.node.image?.large || undefined;
+    const characterRole = charEdge.role || undefined;
 
-    if (existing) {
-      const existingCharacterNames = new Set(
-        (existing.characterName || '')
-          .split(CHARACTER_NAME_SEPARATOR)
-          .map((name) => name.trim())
-          .filter(Boolean)
-      );
-      if (characterName && !existingCharacterNames.has(characterName)) {
-        existing.characterName = existing.characterName
-          ? `${existing.characterName}${CHARACTER_NAME_SEPARATOR}${characterName}`
-          : characterName;
+    for (const media of charEdge.node.media.nodes) {
+      const existing = works.get(media.id);
+
+      if (existing) {
+        const existingCharacterNames = new Set(
+          (existing.characterName || '')
+            .split(CHARACTER_NAME_SEPARATOR)
+            .map((name) => name.trim())
+            .filter(Boolean)
+        );
+        if (characterName && !existingCharacterNames.has(characterName)) {
+          existing.characterName = existing.characterName
+            ? `${existing.characterName}${CHARACTER_NAME_SEPARATOR}${characterName}`
+            : characterName;
+        }
+        if (!existing.characterImage) {
+          existing.characterImage = characterImage;
+        }
+        if (
+          characterRole === 'MAIN' ||
+          (!existing.characterRole && characterRole)
+        ) {
+          existing.characterRole = characterRole ?? existing.characterRole;
+        }
+        continue;
       }
-      if (!existing.characterImage) {
-        existing.characterImage = edge.character?.image?.large || undefined;
-      }
-      if (
-        edge.characterRole === 'MAIN' ||
-        (!existing.characterRole && edge.characterRole)
-      ) {
-        existing.characterRole = edge.characterRole || existing.characterRole;
-      }
-      continue;
+
+      const title =
+        media.title.native ||
+        media.title.romaji ||
+        media.title.english ||
+        'Unknown';
+
+      works.set(media.id, {
+        mediaId: media.id,
+        title,
+        coverImage: media.coverImage?.large || media.coverImage?.medium || undefined,
+        totalEpisodes: extractEpisodeCount(media),
+        genres: media.genres || [],
+        characterName,
+        characterRole,
+        characterImage,
+      });
     }
-
-    works.set(edge.node.id, {
-      mediaId: edge.node.id,
-      title,
-      coverImage: edge.node.coverImage?.large || edge.node.coverImage?.medium || undefined,
-      totalEpisodes: extractEpisodeCount(edge.node),
-      genres: edge.node.genres || [],
-      characterName,
-      characterRole: edge.characterRole || undefined,
-      characterImage: edge.character?.image?.large || undefined,
-    });
   }
 
   return {
