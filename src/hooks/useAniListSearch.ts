@@ -13,6 +13,7 @@ export function useAniListSearch(debounceMs: number = 500) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -26,12 +27,14 @@ export function useAniListSearch(debounceMs: number = 500) {
 
       setLoading(true);
       timerRef.current = setTimeout(() => {
+        const requestId = ++requestIdRef.current;
         void (async () => {
           try {
             const data = await queryAniList<AniListPageResult>(SEARCH_ANIME_QUERY, {
               search: query.trim(),
               perPage: 10,
             });
+            if (requestId !== requestIdRef.current) return;
             if (data) {
               setResults(data.Page.media);
               setError(null);
@@ -40,10 +43,13 @@ export function useAniListSearch(debounceMs: number = 500) {
               setError('検索に失敗しました');
             }
           } catch {
+            if (requestId !== requestIdRef.current) return;
             setResults([]);
             setError('検索に失敗しました');
           } finally {
-            setLoading(false);
+            if (requestId === requestIdRef.current) {
+              setLoading(false);
+            }
           }
         })();
       }, debounceMs);
@@ -62,6 +68,7 @@ export function useVoiceActorSearch(debounceMs: number = 500) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const requestIdRef = useRef(0);
 
   const search = useCallback(
     (searchQuery: string) => {
@@ -77,6 +84,7 @@ export function useVoiceActorSearch(debounceMs: number = 500) {
 
       setLoading(true);
       timerRef.current = setTimeout(() => {
+        const requestId = ++requestIdRef.current;
         void (async () => {
           try {
             const staffResults: StaffWithWorks[] = [];
@@ -91,6 +99,8 @@ export function useVoiceActorSearch(debounceMs: number = 500) {
                 worksPerPage: 50,
               });
 
+              if (requestId !== requestIdRef.current) return;
+
               if (!data) {
                 setResults([]);
                 setError('検索に失敗しました');
@@ -102,13 +112,17 @@ export function useVoiceActorSearch(debounceMs: number = 500) {
               page += 1;
             }
 
+            if (requestId !== requestIdRef.current) return;
             setResults(staffResults);
             setError(null);
           } catch {
+            if (requestId !== requestIdRef.current) return;
             setResults([]);
             setError('検索に失敗しました');
           } finally {
-            setLoading(false);
+            if (requestId === requestIdRef.current) {
+              setLoading(false);
+            }
           }
         })();
       }, debounceMs);

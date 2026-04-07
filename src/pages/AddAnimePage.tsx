@@ -60,6 +60,56 @@ const roleBadgeStyle: CSSProperties = {
   flexShrink: 0,
 };
 
+const successBoxStyle: CSSProperties = {
+  padding: '20px',
+  backgroundColor: '#f0fdf4',
+  border: '1px solid #bbf7d0',
+  borderRadius: '10px',
+  textAlign: 'center',
+};
+
+const successTitleStyle: CSSProperties = {
+  fontSize: '18px',
+  fontWeight: 700,
+  color: '#15803d',
+  marginBottom: '8px',
+};
+
+const successMessageStyle: CSSProperties = {
+  color: '#1f2937',
+  fontSize: '14px',
+  marginBottom: '20px',
+};
+
+const successActionsStyle: CSSProperties = {
+  display: 'flex',
+  gap: '12px',
+  justifyContent: 'center',
+  flexWrap: 'wrap',
+};
+
+const addAnotherBtnStyle: CSSProperties = {
+  padding: '10px 20px',
+  backgroundColor: '#ec4899',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '8px',
+  fontSize: '14px',
+  fontWeight: 600,
+  cursor: 'pointer',
+};
+
+const backToListBtnStyle: CSSProperties = {
+  padding: '10px 20px',
+  backgroundColor: '#fff',
+  color: '#6b7280',
+  border: '1px solid #f9a8d4',
+  borderRadius: '8px',
+  fontSize: '14px',
+  fontWeight: 600,
+  cursor: 'pointer',
+};
+
 type SearchMode = 'anime' | 'voiceActor';
 
 interface SelectionInfo {
@@ -181,6 +231,8 @@ export function AddAnimePage() {
     };
   }, [handleSelectAnime, searchParams]);
 
+  const [addedTitle, setAddedTitle] = useState<string | null>(null);
+
   const handleSubmit = (data: AnimeFormData) => {
     addEntry({
       title: data.title,
@@ -195,7 +247,13 @@ export function AddAnimePage() {
       genres: data.genres,
       coverImage: data.coverImage,
     });
-    navigate('/');
+    setAddedTitle(data.title);
+  };
+
+  const handleAddAnother = () => {
+    setAddedTitle(null);
+    setSelection(null);
+    setShowSearch(true);
   };
 
   const tabBtnStyle = (active: boolean): CSSProperties => ({
@@ -223,7 +281,34 @@ export function AddAnimePage() {
         アニメを追加
       </h1>
 
-      {showSearch && (
+      {addedTitle !== null && (
+        <div style={successBoxStyle}>
+          <div style={successTitleStyle}>
+            ✓ 追加しました
+          </div>
+          <div style={successMessageStyle}>
+            「{addedTitle}」をリストに追加しました。
+          </div>
+          <div style={successActionsStyle}>
+            <button
+              type="button"
+              onClick={handleAddAnother}
+              style={addAnotherBtnStyle}
+            >
+              続けて追加する
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              style={backToListBtnStyle}
+            >
+              一覧に戻る
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showSearch && addedTitle === null && (
         <div style={{ marginBottom: '20px' }}>
           <label style={{ display: 'block', marginBottom: '8px', color: '#6b7280', fontSize: '13px', fontWeight: 600 }}>
             AniListで検索（任意）
@@ -377,7 +462,7 @@ export function AddAnimePage() {
         </div>
       )}
 
-      {!showSearch && selection && (
+      {!showSearch && selection && addedTitle === null && (
         <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#fff0f3', borderRadius: '8px', display: 'flex', gap: '12px', alignItems: 'center' }}>
           {selection.image && (
             <img src={selection.image} alt="" style={{ width: '60px', height: '85px', objectFit: 'cover', borderRadius: '6px' }} />
@@ -401,7 +486,7 @@ export function AddAnimePage() {
         </div>
       )}
 
-      {!showSearch && (
+      {!showSearch && addedTitle === null && (
         <AnimeForm
           initial={selection?.formData}
           onSubmit={handleSubmit}
