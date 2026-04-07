@@ -5,6 +5,10 @@ import { AnimeForm } from '../components/anime/AnimeForm.tsx';
 import type { AnimeFormData } from '../components/anime/AnimeForm.tsx';
 import { StarRating } from '../components/common/StarRating.tsx';
 import { StatusBadge } from '../components/common/StatusBadge.tsx';
+import { queryAniList } from '../api/anilist/client.ts';
+import { SEARCH_ANIME_BY_ID_QUERY } from '../api/anilist/queries.ts';
+import { extractEpisodeCount } from '../api/adapter.ts';
+import type { AniListMediaByIdResult } from '../api/anilist/types.ts';
 import type { CSSProperties } from 'react';
 
 const containerStyle: CSSProperties = {
@@ -34,6 +38,8 @@ export function DetailPage() {
   const { entries, updateEntry, deleteEntry } = useAnimeEntries();
   const [editing, setEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [syncingEpisodes, setSyncingEpisodes] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
 
   const entry = entries.find((e) => e.id === id);
 
@@ -64,6 +70,32 @@ export function DetailPage() {
   const handleDelete = () => {
     deleteEntry(entry.id);
     navigate('/');
+  };
+
+  const handleSyncEpisodes = async () => {
+    if (!entry.anilistMediaId) return;
+    setSyncingEpisodes(true);
+    setSyncMessage(null);
+    try {
+      const data = await queryAniList<AniListMediaByIdResult>(SEARCH_ANIME_BY_ID_QUERY, {
+        id: entry.anilistMediaId,
+      });
+      if (data?.Media) {
+        const episodes = extractEpisodeCount(data.Media);
+        if (episodes !== undefined) {
+          updateEntry(entry.id, { totalEpisodes: episodes });
+          setSyncMessage(`総話数を${episodes}話に更新しました`);
+        } else {
+          setSyncMessage('AniListでもまだ総話数が未定です');
+        }
+      } else {
+        setSyncMessage('AniListからの情報取得に失敗しました');
+      }
+    } catch {
+      setSyncMessage('AniListからの情報取得に失敗しました');
+    } finally {
+      setSyncingEpisodes(false);
+    }
   };
 
   if (editing) {
@@ -130,9 +162,34 @@ export function DetailPage() {
           <div style={{ color: '#6b7280', fontSize: '14px', marginBottom: '8px' }}>{entry.season}</div>
           <StarRating value={entry.rating} readonly size={20} />
           <div style={{ marginTop: '8px' }}><StatusBadge status={entry.watchStatus} /></div>
-          {entry.totalEpisodes !== undefined && (
+          {entry.totalEpisodes !== undefined ? (
             <div style={{ color: '#6b7280', fontSize: '13px', marginTop: '8px' }}>
               視聴話数: {entry.watchedEpisodes ?? 0} / {entry.totalEpisodes}
+            </div>
+          ) : (
+            <div style={{ color: '#9ca3af', fontSize: '13px', marginTop: '8px' }}>総話数: 未定</div>
+          )}
+          {entry.anilistMediaId !== undefined && (
+            <div style={{ marginTop: '8px' }}>
+              <button
+                type="button"
+                onClick={handleSyncEpisodes}
+                disabled={syncingEpisodes}
+                style={{
+                  padding: '4px 10px',
+                  backgroundColor: syncingEpisodes ? '#f9a8d4' : '#fce7f3',
+                  color: '#db2777',
+                  border: '1px solid #f9a8d4',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  cursor: syncingEpisodes ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {syncingEpisodes ? '更新中...' : 'AniListから話数を更新'}
+              </button>
+              {syncMessage && (
+                <div style={{ color: '#6b7280', fontSize: '12px', marginTop: '4px' }}>{syncMessage}</div>
+              )}
             </div>
           )}
         </div>
