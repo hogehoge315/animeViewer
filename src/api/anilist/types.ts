@@ -54,7 +54,7 @@ export interface AniListStaff {
     full: string | null;
     native: string | null;
   };
-  characterMedia: {
+  staffMedia: {
     edges: AniListStaffCharacterMediaEdge[];
   };
 }

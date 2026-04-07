@@ -47,7 +47,7 @@ export function adaptStaffResult(staff: AniListStaff): StaffWithWorks {
     id: staff.id,
     name: staff.name.full || 'Unknown',
     nameNative: staff.name.native || undefined,
-    works: staff.characterMedia.edges.map((edge) => ({
+    works: staff.staffMedia.edges.map((edge) => ({
       mediaId: edge.node.id,
       title:
         edge.node.title.native ||

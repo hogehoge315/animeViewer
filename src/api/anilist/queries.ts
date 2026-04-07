@@ -25,7 +25,7 @@ query SearchByVoiceActor($search: String!) {
     staff(search: $search) {
       id
       name { full native }
-      characterMedia(type: ANIME, sort: [POPULARITY_DESC]) {
+      staffMedia(type: ANIME, sort: [POPULARITY_DESC]) {
         edges {
           node {
             id
