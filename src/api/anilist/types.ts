@@ -18,7 +18,7 @@ export interface AniListVoiceActor {
 }
 
 export interface AniListCharacterEdge {
-  voiceActors: AniListVoiceActor[];
+  voiceActors: AniListVoiceActor[] | null;
 }
 
 export interface AniListCharacters {
