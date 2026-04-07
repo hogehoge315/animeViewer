@@ -1,32 +1,28 @@
 import { HashRouter, Routes, Route, NavLink } from 'react-router-dom';
 import { HomePage } from './pages/HomePage.tsx';
 import { AddAnimePage } from './pages/AddAnimePage.tsx';
-import { SeasonListPage } from './pages/SeasonListPage.tsx';
 import { DetailPage } from './pages/DetailPage.tsx';
 import { ImportExportPage } from './pages/ImportExportPage.tsx';
-import { VoiceActorSearchPage } from './pages/VoiceActorSearchPage.tsx';
 import { DiscoverPage } from './pages/DiscoverPage.tsx';
 import { ErrorBoundary } from './components/common/ErrorBoundary.tsx';
 import type { CSSProperties } from 'react';
 
 const navStyle: CSSProperties = {
   display: 'flex',
-  gap: '4px',
   padding: '8px 16px',
   backgroundColor: '#ffffff',
   borderBottom: '1px solid #fce7f3',
-  overflowX: 'auto',
-  flexWrap: 'nowrap',
 };
 
 const linkBase: CSSProperties = {
-  padding: '6px 14px',
+  flex: 1,
+  padding: '8px 4px',
   borderRadius: '6px',
   textDecoration: 'none',
   fontSize: '13px',
   fontWeight: 500,
   color: '#6b7280',
-  whiteSpace: 'nowrap',
+  textAlign: 'center',
   transition: 'background-color 0.15s, color 0.15s',
 };
 
@@ -42,8 +38,6 @@ function NavBar() {
       <NavLink to="/" end style={getStyle}>ホーム</NavLink>
       <NavLink to="/add" style={getStyle}>追加</NavLink>
       <NavLink to="/discover" style={getStyle}>探す</NavLink>
-      <NavLink to="/seasons" style={getStyle}>シーズン</NavLink>
-      <NavLink to="/voice-actor" style={getStyle}>声優検索</NavLink>
       <NavLink to="/settings" style={getStyle}>設定</NavLink>
     </nav>
   );
@@ -75,8 +69,6 @@ export function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/add" element={<AddAnimePage />} />
             <Route path="/discover" element={<DiscoverPage />} />
-            <Route path="/seasons" element={<SeasonListPage />} />
-            <Route path="/voice-actor" element={<VoiceActorSearchPage />} />
             <Route path="/anime/:id" element={<DetailPage />} />
             <Route path="/settings" element={<ImportExportPage />} />
           </Routes>

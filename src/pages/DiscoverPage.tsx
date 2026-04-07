@@ -1,12 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { queryAniList } from '../api/anilist/client.ts';
-import { SEASON_ANIME_QUERY, POPULARITY_RANKING_QUERY } from '../api/anilist/queries.ts';
+import { POPULARITY_RANKING_QUERY } from '../api/anilist/queries.ts';
 import type { AniListPagedResult, AniListMedia } from '../api/anilist/types.ts';
 import { AnimeDetailModal } from '../components/anime/AnimeDetailModal.tsx';
 import type { CSSProperties } from 'react';
-
-type Tab = 'season' | 'ranking';
 
 type AniListSeason = 'WINTER' | 'SPRING' | 'SUMMER' | 'FALL';
 
@@ -27,18 +25,6 @@ const containerStyle: CSSProperties = {
   margin: '0 auto',
   padding: '20px',
 };
-
-const tabBtnStyle = (active: boolean): CSSProperties => ({
-  padding: '8px 20px',
-  borderRadius: '8px',
-  border: 'none',
-  fontSize: '14px',
-  fontWeight: 600,
-  cursor: 'pointer',
-  backgroundColor: active ? '#ec4899' : '#fce7f3',
-  color: active ? '#fff' : '#6b7280',
-  transition: 'background-color 0.15s, color 0.15s',
-});
 
 const cardStyle: CSSProperties = {
   display: 'flex',
@@ -69,10 +55,9 @@ function extractTitle(media: AniListMedia): string {
 
 export function DiscoverPage() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>('season');
   const { season: currentSeason, year: currentYear } = getCurrentSeason();
-  const [selectedYear, setSelectedYear] = useState(currentYear);
-  const [selectedSeasonName, setSelectedSeasonName] = useState<AniListSeason>(currentSeason);
+  const [selectedYear, setSelectedYear] = useState<number | undefined>(currentYear);
+  const [selectedSeasonName, setSelectedSeasonName] = useState<AniListSeason | undefined>(currentSeason);
   const yearOptions: number[] = [];
   for (let y = currentYear; y >= 1990; y--) yearOptions.push(y);
   const [page, setPage] = useState(1);
@@ -88,14 +73,13 @@ export function DiscoverPage() {
     setLoading(true);
     setError(null);
     try {
-      const query = tab === 'season' ? SEASON_ANIME_QUERY : POPULARITY_RANKING_QUERY;
       const variables: Record<string, unknown> = {
         season: selectedSeasonName,
         seasonYear: selectedYear,
         page,
         perPage: PER_PAGE,
       };
-      const data = await queryAniList<AniListPagedResult>(query, variables);
+      const data = await queryAniList<AniListPagedResult>(POPULARITY_RANKING_QUERY, variables);
       if (data) {
         setMediaList(data.Page.media);
         setHasNextPage(data.Page.pageInfo.hasNextPage);
@@ -107,16 +91,11 @@ export function DiscoverPage() {
     } finally {
       setLoading(false);
     }
-  }, [tab, selectedSeasonName, selectedYear, page]);
+  }, [selectedSeasonName, selectedYear, page]);
 
   useEffect(() => {
     void fetchData();
   }, [fetchData]);
-
-  const handleTabChange = (newTab: Tab) => {
-    setTab(newTab);
-    setPage(1);
-  };
 
   return (
     <div style={containerStyle}>
@@ -124,21 +103,27 @@ export function DiscoverPage() {
         アニメを探す
       </h1>
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-        <button type="button" style={tabBtnStyle(tab === 'season')} onClick={() => handleTabChange('season')}>
-          今期アニメ
-        </button>
-        <button type="button" style={tabBtnStyle(tab === 'ranking')} onClick={() => handleTabChange('ranking')}>
-          人気ランキング
-        </button>
-      </div>
-
-      {/* Season selector */}
+      {/* Filters */}
       <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          onClick={() => { setSelectedYear(currentYear); setSelectedSeasonName(currentSeason); setPage(1); }}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '8px',
+            border: 'none',
+            fontSize: '14px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            backgroundColor: '#ec4899',
+            color: '#fff',
+          }}
+        >
+          今季
+        </button>
         <select
-          value={selectedYear}
-          onChange={(e) => { setSelectedYear(Number(e.target.value)); setPage(1); }}
+          value={selectedYear ?? ''}
+          onChange={(e) => { setSelectedYear(e.target.value === '' ? undefined : Number(e.target.value)); setPage(1); }}
           style={{
             padding: '8px 12px',
             border: '1px solid #f9a8d4',
@@ -148,17 +133,38 @@ export function DiscoverPage() {
             fontSize: '14px',
           }}
         >
+          <option value="">全期間</option>
           {yearOptions.map((y) => (
             <option key={y} value={y}>{y}年</option>
           ))}
         </select>
         <div style={{ display: 'flex', gap: '6px' }}>
+          <button
+            type="button"
+            onClick={() => { setSelectedSeasonName(undefined); setPage(1); }}
+            style={{
+              padding: '6px 14px',
+              borderRadius: '8px',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              backgroundColor: selectedSeasonName === undefined ? '#ec4899' : '#fce7f3',
+              color: selectedSeasonName === undefined ? '#fff' : '#6b7280',
+              transition: 'background-color 0.15s, color 0.15s',
+            }}
+          >
+            全
+          </button>
           {([['SPRING', '春'], ['SUMMER', '夏'], ['FALL', '秋'], ['WINTER', '冬']] as [AniListSeason, string][]).map(([val, label]) => (
-            <label
+            <button
               key={val}
+              type="button"
+              onClick={() => { setSelectedSeasonName(val); setPage(1); }}
               style={{
                 padding: '6px 14px',
                 borderRadius: '8px',
+                border: 'none',
                 fontSize: '14px',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -167,16 +173,8 @@ export function DiscoverPage() {
                 transition: 'background-color 0.15s, color 0.15s',
               }}
             >
-              <input
-                type="radio"
-                name="season"
-                value={val}
-                checked={selectedSeasonName === val}
-                onChange={() => { setSelectedSeasonName(val); setPage(1); }}
-                style={{ display: 'none' }}
-              />
               {label}
-            </label>
+            </button>
           ))}
         </div>
       </div>
@@ -199,24 +197,22 @@ export function DiscoverPage() {
                 style={{ ...cardStyle, cursor: 'pointer' }}
                 onClick={() => setDetailMedia(media)}
               >
-                {tab === 'ranking' && (
-                  <div style={{
-                    flexShrink: 0,
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    backgroundColor: rank <= 3 ? '#ec4899' : '#fce7f3',
-                    color: rank <= 3 ? '#fff' : '#6b7280',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 700,
-                    fontSize: '14px',
-                    alignSelf: 'center',
-                  }}>
-                    {rank}
-                  </div>
-                )}
+                <div style={{
+                  flexShrink: 0,
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  backgroundColor: rank <= 3 ? '#ec4899' : '#fce7f3',
+                  color: rank <= 3 ? '#fff' : '#6b7280',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 700,
+                  fontSize: '14px',
+                  alignSelf: 'center',
+                }}>
+                  {rank}
+                </div>
                 {media.coverImage?.medium ? (
                   <img src={media.coverImage.medium} alt="" style={coverStyle} />
                 ) : (
@@ -232,7 +228,7 @@ export function DiscoverPage() {
                   {media.episodes && (
                     <div style={{ fontSize: '11px', color: '#9ca3af' }}>全{media.episodes}話</div>
                   )}
-                  {tab === 'ranking' && media.popularity && (
+                  {media.popularity && (
                     <div style={{ fontSize: '11px', color: '#f9a8d4', marginTop: '2px' }}>
                       人気度: {media.popularity.toLocaleString()}
                     </div>
