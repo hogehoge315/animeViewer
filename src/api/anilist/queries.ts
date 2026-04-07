@@ -7,6 +7,8 @@ query SearchAnime($search: String!, $perPage: Int) {
       coverImage { medium large }
       episodes
       genres
+      season
+      seasonYear
       characters(role: MAIN, sort: [RELEVANCE]) {
         edges {
           voiceActors(language: JAPANESE) {
@@ -63,6 +65,8 @@ query SearchAnimeById($id: Int!) {
     coverImage { medium large }
     episodes
     genres
+    season
+    seasonYear
     characters(role: MAIN, sort: [RELEVANCE]) {
       edges {
         voiceActors(language: JAPANESE) {
@@ -70,6 +74,50 @@ query SearchAnimeById($id: Int!) {
           name { full native }
         }
       }
+    }
+  }
+}
+`;
+
+export const SEASON_ANIME_QUERY = `
+query SeasonAnime($season: MediaSeason!, $seasonYear: Int!, $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo {
+      hasNextPage
+      currentPage
+      total
+    }
+    media(season: $season, seasonYear: $seasonYear, type: ANIME, sort: [POPULARITY_DESC]) {
+      id
+      title { romaji english native }
+      coverImage { medium large }
+      episodes
+      season
+      seasonYear
+      genres
+      popularity
+    }
+  }
+}
+`;
+
+export const POPULARITY_RANKING_QUERY = `
+query PopularityRanking($season: MediaSeason, $seasonYear: Int, $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo {
+      hasNextPage
+      currentPage
+      total
+    }
+    media(season: $season, seasonYear: $seasonYear, type: ANIME, sort: [POPULARITY_DESC]) {
+      id
+      title { romaji english native }
+      coverImage { medium large }
+      episodes
+      season
+      seasonYear
+      genres
+      popularity
     }
   }
 }

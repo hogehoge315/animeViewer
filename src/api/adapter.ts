@@ -18,6 +18,21 @@ export function extractEpisodeCount(media: AniListMedia): number | undefined {
   return Math.floor(media.episodes);
 }
 
+const ANILIST_SEASON_MAP: Record<string, string> = {
+  WINTER: '冬',
+  SPRING: '春',
+  SUMMER: '夏',
+  FALL: '秋',
+};
+
+export function extractSeason(media: AniListMedia): string | undefined {
+  if (media.season && media.seasonYear) {
+    const seasonJP = ANILIST_SEASON_MAP[media.season];
+    if (seasonJP) return `${media.seasonYear}${seasonJP}`;
+  }
+  return undefined;
+}
+
 export function extractVoiceActors(media: AniListMedia): VoiceActor[] {
   if (!media.characters?.edges) return [];
 

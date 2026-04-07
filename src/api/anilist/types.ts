@@ -32,6 +32,9 @@ export interface AniListMedia {
   episodes?: number | null;
   genres: string[] | null;
   characters?: AniListCharacters;
+  season?: 'WINTER' | 'SPRING' | 'SUMMER' | 'FALL' | null;
+  seasonYear?: number | null;
+  popularity?: number | null;
 }
 
 export interface AniListPageResult {
@@ -94,6 +97,13 @@ export interface AniListStaffPageResult {
   Page: {
     pageInfo: AniListPageInfo;
     staff: AniListStaff[];
+  };
+}
+
+export interface AniListPagedResult {
+  Page: {
+    pageInfo: AniListPageInfo;
+    media: AniListMedia[];
   };
 }
 

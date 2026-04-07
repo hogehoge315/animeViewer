@@ -22,6 +22,8 @@ interface AnimeFormProps {
   initial?: Partial<AnimeFormData>;
   onSubmit: (data: AnimeFormData) => void;
   submitLabel?: string;
+  fromApi?: boolean;
+  apiSeason?: string;
 }
 
 const labelStyle: CSSProperties = {
@@ -56,9 +58,15 @@ const errorStyle: CSSProperties = {
 const seasons = generateRecentSeasons(12);
 const statuses = Object.entries(WATCH_STATUS_LABELS) as [WatchStatus, string][];
 
-export function AnimeForm({ initial, onSubmit, submitLabel = '保存' }: AnimeFormProps) {
+const lockedTextStyle: CSSProperties = {
+  fontSize: '14px',
+  color: '#1f2937',
+  padding: '8px 0',
+};
+
+export function AnimeForm({ initial, onSubmit, submitLabel = '保存', fromApi, apiSeason }: AnimeFormProps) {
   const [title, setTitle] = useState(initial?.title || '');
-  const [season, setSeason] = useState(initial?.season || seasons[0]);
+  const [season, setSeason] = useState(apiSeason || initial?.season || seasons[0]);
   const [rating, setRating] = useState<number | undefined>(initial?.rating);
   const [comment, setComment] = useState(initial?.comment || '');
   const [watchStatus, setWatchStatus] = useState<WatchStatus>(initial?.watchStatus || 'plan_to_watch');
@@ -120,26 +128,34 @@ export function AnimeForm({ initial, onSubmit, submitLabel = '保存' }: AnimeFo
 
       <div style={fieldGroupStyle}>
         <label style={labelStyle}>タイトル *</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          style={inputStyle}
-          placeholder="アニメタイトル"
-        />
+        {fromApi ? (
+          <div style={lockedTextStyle}>{title}</div>
+        ) : (
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={inputStyle}
+            placeholder="アニメタイトル"
+          />
+        )}
       </div>
 
       <div style={fieldGroupStyle}>
         <label style={labelStyle}>シーズン *</label>
-        <select
-          value={season}
-          onChange={(e) => setSeason(e.target.value)}
-          style={inputStyle}
-        >
-          {seasons.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
+        {fromApi && apiSeason ? (
+          <div style={lockedTextStyle}>{season}</div>
+        ) : (
+          <select
+            value={season}
+            onChange={(e) => setSeason(e.target.value)}
+            style={inputStyle}
+          >
+            {seasons.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div style={fieldGroupStyle}>
@@ -162,13 +178,17 @@ export function AnimeForm({ initial, onSubmit, submitLabel = '保存' }: AnimeFo
 
       <div style={fieldGroupStyle}>
         <label style={labelStyle}>総話数</label>
-        <input
-          type="number"
-          min="0"
-          value={totalEpisodes ?? ''}
-          readOnly
-          style={{ ...inputStyle, backgroundColor: '#f9fafb', color: '#6b7280', cursor: 'default' }}
-        />
+        {fromApi ? (
+          <div style={lockedTextStyle}>{totalEpisodes != null ? `${totalEpisodes}話` : '未定'}</div>
+        ) : (
+          <input
+            type="number"
+            min="0"
+            value={totalEpisodes ?? ''}
+            readOnly
+            style={{ ...inputStyle, backgroundColor: '#f9fafb', color: '#6b7280', cursor: 'default' }}
+          />
+        )}
       </div>
 
       <div style={fieldGroupStyle}>
