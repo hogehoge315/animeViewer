@@ -36,7 +36,7 @@ export function useAniListSearch(debounceMs: number = 500) {
             });
             if (requestId !== requestIdRef.current) return;
             if (data) {
-              setResults(data.Page.media);
+              setResults(data.Page.media.filter((m: AniListMedia) => !(m.genres || []).includes('Hentai')));
               setError(null);
             } else {
               setResults([]);

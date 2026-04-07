@@ -144,6 +144,19 @@ export function AnimeCard({ entry, onProgressCommit }: AnimeCardProps) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <button
               type="button"
+              onClick={() => {
+                if (draftWatchedEpisodes !== null) {
+                  onProgressCommit(draftWatchedEpisodes);
+                }
+              }}
+              style={{ ...confirmButtonStyle, visibility: hasPendingProgressChange ? 'visible' : 'hidden' }}
+              disabled={!hasPendingProgressChange}
+              aria-label={`${entry.title}の視聴済み話数の変更を確定する`}
+            >
+              ✓
+            </button>
+            <button
+              type="button"
               onClick={() => updateDraft(displayedWatchedEpisodes - 1)}
               style={{ ...progressButtonStyle, ...(isMinReached ? { opacity: 0.4, cursor: 'not-allowed' } : {}) }}
               disabled={isMinReached}
@@ -159,19 +172,6 @@ export function AnimeCard({ entry, onProgressCommit }: AnimeCardProps) {
               aria-label={`${entry.title}の視聴済み話数を1話増やす`}
             >
               ＋
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (draftWatchedEpisodes !== null) {
-                  onProgressCommit(draftWatchedEpisodes);
-                }
-              }}
-              style={{ ...confirmButtonStyle, visibility: hasPendingProgressChange ? 'visible' : 'hidden' }}
-              disabled={!hasPendingProgressChange}
-              aria-label={`${entry.title}の視聴済み話数の変更を確定する`}
-            >
-              ✓
             </button>
           </div>
           <div style={{ ...metaStyle, textAlign: 'right' }}>話数更新</div>

@@ -1,7 +1,7 @@
 export const SEARCH_ANIME_QUERY = `
 query SearchAnime($search: String!, $perPage: Int) {
   Page(perPage: $perPage) {
-    media(search: $search, type: ANIME) {
+    media(search: $search, type: ANIME, isAdult: false) {
       id
       title { romaji english native }
       coverImage { medium large }
@@ -87,7 +87,7 @@ query SeasonAnime($season: MediaSeason!, $seasonYear: Int!, $page: Int, $perPage
       currentPage
       total
     }
-    media(season: $season, seasonYear: $seasonYear, type: ANIME, sort: [POPULARITY_DESC]) {
+    media(season: $season, seasonYear: $seasonYear, type: ANIME, sort: [POPULARITY_DESC], isAdult: false) {
       id
       title { romaji english native }
       coverImage { medium large }
@@ -112,7 +112,7 @@ query PopularityRanking($season: MediaSeason, $seasonYear: Int, $page: Int, $per
       currentPage
       total
     }
-    media(season: $season, seasonYear: $seasonYear, type: ANIME, sort: [POPULARITY_DESC]) {
+    media(season: $season, seasonYear: $seasonYear, type: ANIME, sort: [POPULARITY_DESC], isAdult: false) {
       id
       title { romaji english native }
       coverImage { medium large }
