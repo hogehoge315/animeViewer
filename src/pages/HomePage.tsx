@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAnimeEntries } from '../hooks/useAnimeEntries.ts';
 import { filterEntries, groupBySeason, computeSeasonStats } from '../services/searchService.ts';
@@ -78,11 +78,16 @@ export function HomePage() {
     return Array.from(years).sort((a, b) => b - a);
   }, [entries]);
 
-  const defaultYear = allYears[0] ?? new Date().getFullYear();
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number>(allYears[0] ?? new Date().getFullYear());
   const [selectedSeasonName, setSelectedSeasonName] = useState<string>('全');
 
-  const activeYear = selectedYear ?? defaultYear;
+  useEffect(() => {
+    if (allYears.length > 0) {
+      setSelectedYear((prev) => (allYears.includes(prev) ? prev : allYears[0]));
+    }
+  }, [allYears]);
+
+  const activeYear = selectedYear;
 
   const seasonGrouped = useMemo(() => {
     const yearEntries = entries.filter((e) => {
