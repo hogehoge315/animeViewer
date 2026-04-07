@@ -251,9 +251,14 @@ export function AddAnimePage() {
   };
 
   const handleAddAnother = () => {
-    setAddedTitle(null);
-    setSelection(null);
-    setShowSearch(true);
+    const from = searchParams.get('from');
+    if (from === 'discover') {
+      navigate('/discover');
+    } else {
+      setAddedTitle(null);
+      setSelection(null);
+      setShowSearch(true);
+    }
   };
 
   const tabBtnStyle = (active: boolean): CSSProperties => ({

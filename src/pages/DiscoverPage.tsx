@@ -240,7 +240,7 @@ export function DiscoverPage() {
                 </div>
                 <div onClick={(e) => e.stopPropagation()}>
                   <Link
-                    to={`/add?mediaId=${media.id}&title=${encodeURIComponent(extractTitle(media))}`}
+                    to={`/add?mediaId=${media.id}&title=${encodeURIComponent(extractTitle(media))}&from=discover`}
                     style={{
                       flexShrink: 0,
                       padding: '6px 12px',
@@ -269,7 +269,7 @@ export function DiscoverPage() {
           onClose={() => setDetailMedia(null)}
           onAdd={(media) => {
             setDetailMedia(null);
-            navigate(`/add?mediaId=${media.id}&title=${encodeURIComponent(extractTitle(media))}`);
+            navigate(`/add?mediaId=${media.id}&title=${encodeURIComponent(extractTitle(media))}&from=discover`);
           }}
         />
       )}
