@@ -21,7 +21,7 @@ function normalizeEpisodes(
   watchedEpisodes?: number
 ): Pick<AnimeEntry, 'totalEpisodes' | 'watchedEpisodes'> {
   const total =
-    typeof totalEpisodes === 'number' && Number.isFinite(totalEpisodes) && totalEpisodes >= 0
+    typeof totalEpisodes === 'number' && Number.isFinite(totalEpisodes) && totalEpisodes > 0
       ? Math.floor(totalEpisodes)
       : undefined;
   const watched =

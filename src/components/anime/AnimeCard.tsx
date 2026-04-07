@@ -130,13 +130,21 @@ export function AnimeCard({ entry, onProgressCommit }: AnimeCardProps) {
       </Link>
 
       {entry.totalEpisodes !== undefined && onProgressCommit && (
-        <div style={progressPanelStyle}>
+        <div
+          style={progressPanelStyle}
+          aria-label={
+            hasPendingProgressChange
+              ? `${entry.title}の視聴話数変更は未確定です`
+              : `${entry.title}の視聴話数を調整できます`
+          }
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <button
               type="button"
               onClick={() => updateDraft(displayedWatchedEpisodes - 1)}
               style={progressButtonStyle}
               disabled={displayedWatchedEpisodes <= 0}
+              aria-label={`${entry.title}の視聴済み話数を1話減らす`}
             >
               −
             </button>
@@ -145,6 +153,7 @@ export function AnimeCard({ entry, onProgressCommit }: AnimeCardProps) {
               onClick={() => updateDraft(displayedWatchedEpisodes + 1)}
               style={progressButtonStyle}
               disabled={displayedWatchedEpisodes >= entry.totalEpisodes}
+              aria-label={`${entry.title}の視聴済み話数を1話増やす`}
             >
               ＋
             </button>
@@ -157,6 +166,7 @@ export function AnimeCard({ entry, onProgressCommit }: AnimeCardProps) {
                   }
                 }}
                 style={confirmButtonStyle}
+                aria-label={`${entry.title}の視聴済み話数の変更を確定する`}
               >
                 ✓
               </button>

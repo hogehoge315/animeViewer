@@ -5,6 +5,8 @@ import { queryAniList } from '../api/anilist/client.ts';
 import { SEARCH_ANIME_QUERY, SEARCH_BY_VOICE_ACTOR_QUERY } from '../api/anilist/queries.ts';
 import { adaptStaffResult } from '../api/adapter.ts';
 
+const MAX_VOICE_ACTOR_RESULT_PAGES = 5;
+
 export function useAniListSearch(debounceMs: number = 500) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<AniListMedia[]>([]);
@@ -71,7 +73,7 @@ export function useVoiceActorSearch(debounceMs: number = 500) {
         let page = 1;
         let hasNextPage = true;
 
-        while (hasNextPage) {
+        while (hasNextPage && page <= MAX_VOICE_ACTOR_RESULT_PAGES) {
           const data = await queryAniList<AniListStaffPageResult>(SEARCH_BY_VOICE_ACTOR_QUERY, {
             search: searchQuery.trim(),
             page,

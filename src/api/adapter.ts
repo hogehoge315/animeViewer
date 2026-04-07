@@ -1,6 +1,8 @@
 import type { VoiceActor } from '../domain/types.ts';
 import type { AniListMedia, AniListStaff } from './anilist/types.ts';
 
+const CHARACTER_NAME_SEPARATOR = ' / ';
+
 export function extractTitle(media: AniListMedia): string {
   return media.title.native || media.title.romaji || media.title.english || 'Unknown';
 }
@@ -75,9 +77,15 @@ export function adaptStaffResult(staff: AniListStaff): StaffWithWorks {
     const existing = works.get(edge.node.id);
 
     if (existing) {
-      if (characterName && !existing.characterName?.includes(characterName)) {
+      const existingCharacterNames = new Set(
+        (existing.characterName || '')
+          .split(CHARACTER_NAME_SEPARATOR)
+          .map((name) => name.trim())
+          .filter(Boolean)
+      );
+      if (characterName && !existingCharacterNames.has(characterName)) {
         existing.characterName = existing.characterName
-          ? `${existing.characterName} / ${characterName}`
+          ? `${existing.characterName}${CHARACTER_NAME_SEPARATOR}${characterName}`
           : characterName;
       }
       if (!existing.characterImage) {

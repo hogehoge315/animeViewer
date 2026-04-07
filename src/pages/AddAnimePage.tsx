@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAnimeEntries } from '../hooks/useAnimeEntries.ts';
 import { useAniListSearch, useVoiceActorSearch } from '../hooks/useAniListSearch.ts';
@@ -88,7 +88,7 @@ export function AddAnimePage() {
     return null;
   };
 
-  const handleSelectAnime = (media: AniListMedia) => {
+  const handleSelectAnime = useCallback((media: AniListMedia) => {
     setSelection({
       title: extractTitle(media),
       image: extractCoverImage(media),
@@ -104,7 +104,7 @@ export function AddAnimePage() {
       },
     });
     setShowSearch(false);
-  };
+  }, []);
 
   const handleSelectWork = (work: StaffWithWorks['works'][number], staff: StaffWithWorks) => {
     const voiceActor: VoiceActor = { id: staff.id, name: staff.name, nameNative: staff.nameNative };
@@ -141,31 +141,36 @@ export function AddAnimePage() {
     let cancelled = false;
 
     const prefillSelection = async () => {
-      const data = await queryAniList<AniListMediaByIdResult>(SEARCH_ANIME_BY_ID_QUERY, {
-        id: mediaId,
-      });
+      try {
+        const data = await queryAniList<AniListMediaByIdResult>(SEARCH_ANIME_BY_ID_QUERY, {
+          id: mediaId,
+        });
 
-      if (cancelled) return;
+        if (cancelled) return;
 
-      if (data?.Media) {
-        handleSelectAnime(data.Media);
-        setPrefillError(null);
-        return;
-      }
+        if (data?.Media) {
+          handleSelectAnime(data.Media);
+          setPrefillError(null);
+          return;
+        }
 
-      const fallbackTitle = searchParams.get('title') || '';
-      setSelection({
-        title: fallbackTitle || '作品を追加',
-        genres: [],
-        formData: {
-          title: fallbackTitle,
-          anilistMediaId: mediaId,
-          voiceActors: [],
+        const fallbackTitle = searchParams.get('title') || '';
+        setSelection({
+          title: fallbackTitle || '作品を追加',
           genres: [],
-        },
-      });
-      setShowSearch(false);
-      setPrefillError('作品情報の一部を取得できなかったため、タイトルのみ入力済みにしました');
+          formData: {
+            title: fallbackTitle,
+            anilistMediaId: mediaId,
+            voiceActors: [],
+            genres: [],
+          },
+        });
+        setShowSearch(false);
+        setPrefillError('作品情報の一部を取得できなかったため、タイトルのみ入力済みにしました');
+      } catch {
+        if (cancelled) return;
+        setPrefillError('アニメ情報の取得に失敗しました');
+      }
     };
 
     void prefillSelection();
@@ -173,7 +178,7 @@ export function AddAnimePage() {
     return () => {
       cancelled = true;
     };
-  }, [searchParams]);
+  }, [handleSelectAnime, searchParams]);
 
   const handleSubmit = (data: AnimeFormData) => {
     addEntry({

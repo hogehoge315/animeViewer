@@ -46,7 +46,14 @@ function toStringArray(val: unknown): string[] {
   return val.filter((v): v is string => typeof v === 'string');
 }
 
-function toEpisodeCount(val: unknown): number | undefined {
+function normalizePositiveEpisodeCount(val: unknown): number | undefined {
+  if (typeof val !== 'number' || !Number.isFinite(val) || val <= 0) {
+    return undefined;
+  }
+  return Math.floor(val);
+}
+
+function normalizeNonNegativeEpisodeCount(val: unknown): number | undefined {
   if (typeof val !== 'number' || !Number.isFinite(val) || val < 0) {
     return undefined;
   }
@@ -54,8 +61,8 @@ function toEpisodeCount(val: unknown): number | undefined {
 }
 
 function normalizeEntry(entry: Record<string, unknown>): AnimeEntry {
-  const totalEpisodes = toEpisodeCount(entry.totalEpisodes);
-  const watchedEpisodes = toEpisodeCount(entry.watchedEpisodes);
+  const totalEpisodes = normalizePositiveEpisodeCount(entry.totalEpisodes);
+  const watchedEpisodes = normalizeNonNegativeEpisodeCount(entry.watchedEpisodes);
 
   return {
     id: (entry.id as string) || crypto.randomUUID(),

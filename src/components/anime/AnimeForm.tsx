@@ -69,14 +69,15 @@ export function AnimeForm({ initial, onSubmit, submitLabel = '保存' }: AnimeFo
   const parseEpisodeValue = (value: string): number | undefined => {
     if (!value.trim()) return undefined;
     const parsed = Number(value);
-    if (!Number.isFinite(parsed)) return undefined;
-    return Math.max(0, Math.floor(parsed));
+    if (parsed < 0 || !Number.isFinite(parsed)) return undefined;
+    return Math.floor(parsed);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const errs: string[] = [];
-    const normalizedTotalEpisodes = totalEpisodes !== undefined ? Math.max(0, Math.floor(totalEpisodes)) : undefined;
+    const normalizedTotalEpisodes =
+      totalEpisodes !== undefined && totalEpisodes > 0 ? Math.floor(totalEpisodes) : undefined;
     const normalizedWatchedEpisodes = watchedEpisodes !== undefined ? Math.max(0, Math.floor(watchedEpisodes)) : undefined;
     if (!title.trim()) errs.push('タイトルは必須です');
     if (!season.trim()) errs.push('シーズンは必須です');
