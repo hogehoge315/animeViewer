@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import type { AniListMedia, AniListExternalLink } from '../../api/anilist/types.ts';
 
@@ -199,6 +200,14 @@ const addButtonStyle: CSSProperties = {
 };
 
 export function AnimeDetailModal({ media, onClose, onAdd }: AnimeDetailModalProps) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const displayTitle = media.title.english ?? media.title.romaji ?? media.title.native ?? 'Unknown';
   const nativeTitle = media.title.native;
   const coverSrc = media.coverImage?.large ?? media.coverImage?.medium ?? null;
@@ -237,7 +246,7 @@ export function AnimeDetailModal({ media, onClose, onAdd }: AnimeDetailModalProp
 
           {studios.length > 0 && (
             <div style={metaStyle}>
-              {studios.map((s) => s.name).join(', ')}
+              {studios.map((studio) => studio.name).join(', ')}
             </div>
           )}
 
