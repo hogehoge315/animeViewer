@@ -96,6 +96,9 @@ query SeasonAnime($season: MediaSeason!, $seasonYear: Int!, $page: Int, $perPage
       seasonYear
       genres
       popularity
+      description(asHtml: false)
+      studios(isMain: true) { nodes { id name } }
+      externalLinks { id url site type icon color }
     }
   }
 }
@@ -118,7 +121,27 @@ query PopularityRanking($season: MediaSeason, $seasonYear: Int, $page: Int, $per
       seasonYear
       genres
       popularity
+      description(asHtml: false)
+      studios(isMain: true) { nodes { id name } }
+      externalLinks { id url site type icon color }
     }
+  }
+}
+`;
+
+export const ANIME_DETAIL_QUERY = `
+query AnimeDetail($id: Int!) {
+  Media(id: $id, type: ANIME) {
+    id
+    title { romaji english native }
+    coverImage { medium large }
+    episodes
+    genres
+    season
+    seasonYear
+    description(asHtml: false)
+    studios(isMain: true) { nodes { id name } }
+    externalLinks { id url site type icon color }
   }
 }
 `;

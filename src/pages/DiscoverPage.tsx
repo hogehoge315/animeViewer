@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { queryAniList } from '../api/anilist/client.ts';
 import { SEASON_ANIME_QUERY, POPULARITY_RANKING_QUERY } from '../api/anilist/queries.ts';
 import type { AniListPagedResult, AniListMedia } from '../api/anilist/types.ts';
+import { AnimeDetailModal } from '../components/anime/AnimeDetailModal.tsx';
 import type { CSSProperties } from 'react';
 
 type Tab = 'season' | 'ranking';
@@ -90,6 +91,7 @@ function extractTitle(media: AniListMedia): string {
 }
 
 export function DiscoverPage() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('season');
   const seasonOptions = generateSeasonOptions(20);
   const [selectedSeason, setSelectedSeason] = useState<SeasonOption>(seasonOptions[0]);
@@ -98,6 +100,7 @@ export function DiscoverPage() {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [detailMedia, setDetailMedia] = useState<AniListMedia | null>(null);
 
   const PER_PAGE = 20;
 
@@ -191,7 +194,11 @@ export function DiscoverPage() {
           {mediaList.map((media, idx) => {
             const rank = (page - 1) * PER_PAGE + idx + 1;
             return (
-              <div key={media.id} style={cardStyle}>
+              <div
+                key={media.id}
+                style={{ ...cardStyle, cursor: 'pointer' }}
+                onClick={() => setDetailMedia(media)}
+              >
                 {tab === 'ranking' && (
                   <div style={{
                     flexShrink: 0,
@@ -231,26 +238,40 @@ export function DiscoverPage() {
                     </div>
                   )}
                 </div>
-                <Link
-                  to={`/add?mediaId=${media.id}&title=${encodeURIComponent(extractTitle(media))}`}
-                  style={{
-                    flexShrink: 0,
-                    padding: '6px 12px',
-                    backgroundColor: '#ec4899',
-                    color: '#fff',
-                    textDecoration: 'none',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    alignSelf: 'center',
-                  }}
-                >
-                  追加
-                </Link>
+                <div onClick={(e) => e.stopPropagation()}>
+                  <Link
+                    to={`/add?mediaId=${media.id}&title=${encodeURIComponent(extractTitle(media))}`}
+                    style={{
+                      flexShrink: 0,
+                      padding: '6px 12px',
+                      backgroundColor: '#ec4899',
+                      color: '#fff',
+                      textDecoration: 'none',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      alignSelf: 'center',
+                      display: 'block',
+                    }}
+                  >
+                    追加
+                  </Link>
+                </div>
               </div>
             );
           })}
         </div>
+      )}
+
+      {detailMedia && (
+        <AnimeDetailModal
+          media={detailMedia}
+          onClose={() => setDetailMedia(null)}
+          onAdd={(media) => {
+            setDetailMedia(null);
+            navigate(`/add?mediaId=${media.id}&title=${encodeURIComponent(extractTitle(media))}`);
+          }}
+        />
       )}
 
       {/* Pagination */}
