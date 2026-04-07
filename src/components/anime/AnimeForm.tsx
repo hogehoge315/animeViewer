@@ -194,14 +194,42 @@ export function AnimeForm({ initial, onSubmit, submitLabel = '保存', fromApi, 
 
       <div style={fieldGroupStyle}>
         <label style={labelStyle}>視聴済み話数</label>
-        <input
-          type="number"
-          min="0"
-          value={watchedEpisodes ?? ''}
-          onChange={(e) => setWatchedEpisodes(parseEpisodeValue(e.target.value))}
-          style={inputStyle}
-          placeholder="0"
-        />
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <input
+            type="number"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            min="0"
+            value={watchedEpisodes ?? ''}
+            onChange={(e) => setWatchedEpisodes(parseEpisodeValue(e.target.value))}
+            onKeyDown={(e) => {
+              if (['e', 'E', '+', '-', '.'].includes(e.key)) {
+                e.preventDefault();
+              }
+            }}
+            style={{ ...inputStyle, flex: 1 }}
+            placeholder="0"
+          />
+          {totalEpisodes !== undefined && totalEpisodes > 0 && (
+            <button
+              type="button"
+              onClick={() => setWatchedEpisodes(totalEpisodes)}
+              style={{
+                padding: '8px 12px',
+                backgroundColor: '#ec4899',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              全部見た
+            </button>
+          )}
+        </div>
       </div>
 
       <div style={fieldGroupStyle}>
