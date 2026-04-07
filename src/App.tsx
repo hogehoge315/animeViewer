@@ -5,6 +5,7 @@ import { SeasonListPage } from './pages/SeasonListPage.tsx';
 import { DetailPage } from './pages/DetailPage.tsx';
 import { ImportExportPage } from './pages/ImportExportPage.tsx';
 import { VoiceActorSearchPage } from './pages/VoiceActorSearchPage.tsx';
+import { DiscoverPage } from './pages/DiscoverPage.tsx';
 import { ErrorBoundary } from './components/common/ErrorBoundary.tsx';
 import type { CSSProperties } from 'react';
 
@@ -40,6 +41,7 @@ function NavBar() {
     <nav style={navStyle}>
       <NavLink to="/" end style={getStyle}>ホーム</NavLink>
       <NavLink to="/add" style={getStyle}>追加</NavLink>
+      <NavLink to="/discover" style={getStyle}>探す</NavLink>
       <NavLink to="/seasons" style={getStyle}>シーズン</NavLink>
       <NavLink to="/voice-actor" style={getStyle}>声優検索</NavLink>
       <NavLink to="/settings" style={getStyle}>設定</NavLink>
@@ -72,6 +74,7 @@ export function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/add" element={<AddAnimePage />} />
+            <Route path="/discover" element={<DiscoverPage />} />
             <Route path="/seasons" element={<SeasonListPage />} />
             <Route path="/voice-actor" element={<VoiceActorSearchPage />} />
             <Route path="/anime/:id" element={<DetailPage />} />
