@@ -8,14 +8,19 @@ interface AnimeDetailModalProps {
 }
 
 function stripHtml(text: string): string {
-  return text.replace(/<[^>]*>/g, '').trim();
+  let result = text;
+  let previous = '';
+  while (result !== previous) {
+    previous = result;
+    result = result.replace(/<[^>]*>/g, '');
+  }
+  return result.trim();
 }
 
 function getLinkIcon(link: AniListExternalLink): string {
   const site = link.site.toLowerCase();
-  const url = link.url.toLowerCase();
 
-  if (site.includes('twitter') || url.includes('x.com')) return '𝕏';
+  if (site.includes('twitter') || site.includes('x') || /^https?:\/\/([^/]*\.)?x\.com(\/|$)/i.test(link.url)) return '𝕏';
   if (site.includes('youtube')) return '▶';
   if (site.includes('crunchyroll')) return 'CR';
   if (site.includes('netflix')) return 'N';
