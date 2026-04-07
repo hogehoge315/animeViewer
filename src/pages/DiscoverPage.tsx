@@ -10,12 +10,6 @@ type Tab = 'season' | 'ranking';
 
 type AniListSeason = 'WINTER' | 'SPRING' | 'SUMMER' | 'FALL';
 
-interface SeasonOption {
-  label: string;
-  season: AniListSeason;
-  year: number;
-}
-
 function getCurrentSeason(): { season: AniListSeason; year: number } {
   const now = new Date();
   const month = now.getMonth() + 1;
@@ -26,23 +20,6 @@ function getCurrentSeason(): { season: AniListSeason; year: number } {
   else if (month <= 9) season = 'SUMMER';
   else season = 'FALL';
   return { season, year };
-}
-
-function generateSeasonOptions(count: number = 20): SeasonOption[] {
-  const seasonJP: Record<AniListSeason, string> = {
-    WINTER: '冬', SPRING: '春', SUMMER: '夏', FALL: '秋',
-  };
-  const order: AniListSeason[] = ['WINTER', 'SPRING', 'SUMMER', 'FALL'];
-  const { season: curSeason, year: curYear } = getCurrentSeason();
-  let si = order.indexOf(curSeason);
-  let year = curYear;
-  const result: SeasonOption[] = [];
-  for (let i = 0; i < count; i++) {
-    result.push({ label: `${year}${seasonJP[order[si]]}`, season: order[si], year });
-    si--;
-    if (si < 0) { si = 3; year--; }
-  }
-  return result;
 }
 
 const containerStyle: CSSProperties = {
@@ -93,8 +70,11 @@ function extractTitle(media: AniListMedia): string {
 export function DiscoverPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('season');
-  const seasonOptions = generateSeasonOptions(20);
-  const [selectedSeason, setSelectedSeason] = useState<SeasonOption>(seasonOptions[0]);
+  const { season: currentSeason, year: currentYear } = getCurrentSeason();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [selectedSeasonName, setSelectedSeasonName] = useState<AniListSeason>(currentSeason);
+  const yearOptions: number[] = [];
+  for (let y = currentYear; y >= 1990; y--) yearOptions.push(y);
   const [page, setPage] = useState(1);
   const [mediaList, setMediaList] = useState<AniListMedia[]>([]);
   const [hasNextPage, setHasNextPage] = useState(false);
@@ -110,8 +90,8 @@ export function DiscoverPage() {
     try {
       const query = tab === 'season' ? SEASON_ANIME_QUERY : POPULARITY_RANKING_QUERY;
       const variables: Record<string, unknown> = {
-        season: selectedSeason.season,
-        seasonYear: selectedSeason.year,
+        season: selectedSeasonName,
+        seasonYear: selectedYear,
         page,
         perPage: PER_PAGE,
       };
@@ -127,7 +107,7 @@ export function DiscoverPage() {
     } finally {
       setLoading(false);
     }
-  }, [tab, selectedSeason, page]);
+  }, [tab, selectedSeasonName, selectedYear, page]);
 
   useEffect(() => {
     void fetchData();
@@ -135,11 +115,6 @@ export function DiscoverPage() {
 
   const handleTabChange = (newTab: Tab) => {
     setTab(newTab);
-    setPage(1);
-  };
-
-  const handleSeasonChange = (option: SeasonOption) => {
-    setSelectedSeason(option);
     setPage(1);
   };
 
@@ -160,26 +135,51 @@ export function DiscoverPage() {
       </div>
 
       {/* Season selector */}
-      <select
-        value={selectedSeason.label}
-        onChange={(e) => {
-          const opt = seasonOptions.find((o) => o.label === e.target.value);
-          if (opt) handleSeasonChange(opt);
-        }}
-        style={{
-          padding: '8px 12px',
-          border: '1px solid #f9a8d4',
-          borderRadius: '8px',
-          backgroundColor: '#ffffff',
-          color: '#1f2937',
-          fontSize: '14px',
-          marginBottom: '16px',
-        }}
-      >
-        {seasonOptions.map((opt) => (
-          <option key={opt.label} value={opt.label}>{opt.label}</option>
-        ))}
-      </select>
+      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap' }}>
+        <select
+          value={selectedYear}
+          onChange={(e) => { setSelectedYear(Number(e.target.value)); setPage(1); }}
+          style={{
+            padding: '8px 12px',
+            border: '1px solid #f9a8d4',
+            borderRadius: '8px',
+            backgroundColor: '#ffffff',
+            color: '#1f2937',
+            fontSize: '14px',
+          }}
+        >
+          {yearOptions.map((y) => (
+            <option key={y} value={y}>{y}年</option>
+          ))}
+        </select>
+        <div style={{ display: 'flex', gap: '6px' }}>
+          {([['SPRING', '春'], ['SUMMER', '夏'], ['FALL', '秋'], ['WINTER', '冬']] as [AniListSeason, string][]).map(([val, label]) => (
+            <label
+              key={val}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                backgroundColor: selectedSeasonName === val ? '#ec4899' : '#fce7f3',
+                color: selectedSeasonName === val ? '#fff' : '#6b7280',
+                transition: 'background-color 0.15s, color 0.15s',
+              }}
+            >
+              <input
+                type="radio"
+                name="season"
+                value={val}
+                checked={selectedSeasonName === val}
+                onChange={() => { setSelectedSeasonName(val); setPage(1); }}
+                style={{ display: 'none' }}
+              />
+              {label}
+            </label>
+          ))}
+        </div>
+      </div>
 
       {/* Content */}
       {loading && (

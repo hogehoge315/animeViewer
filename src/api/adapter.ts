@@ -85,6 +85,7 @@ export function adaptStaffResult(staff: AniListStaff): StaffWithWorks {
     const characterRole = charEdge.role || undefined;
 
     for (const media of charEdge.node.media.nodes) {
+      if (media.genres && media.genres.includes('Hentai')) continue;
       const existing = works.get(media.id);
 
       if (existing) {
