@@ -25,6 +25,20 @@ export interface AniListCharacters {
   edges: AniListCharacterEdge[];
 }
 
+export interface AniListStudio {
+  id: number;
+  name: string;
+}
+
+export interface AniListExternalLink {
+  id: number;
+  url: string;
+  site: string;
+  type: string | null;
+  icon: string | null;
+  color: string | null;
+}
+
 export interface AniListMedia {
   id: number;
   title: AniListTitle;
@@ -35,6 +49,9 @@ export interface AniListMedia {
   season?: 'WINTER' | 'SPRING' | 'SUMMER' | 'FALL' | null;
   seasonYear?: number | null;
   popularity?: number | null;
+  description?: string | null;
+  studios?: { nodes: AniListStudio[] };
+  externalLinks?: AniListExternalLink[];
 }
 
 export interface AniListPageResult {
