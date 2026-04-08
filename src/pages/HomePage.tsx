@@ -61,13 +61,34 @@ const statuses = Object.entries(WATCH_STATUS_LABELS) as [WatchStatus, string][];
 
 const SEASON_NAMES = ['春', '夏', '秋', '冬'] as const;
 
+type SortField = 'title' | 'season' | 'rating';
+type SortOrder = 'asc' | 'desc';
+
 export function HomePage() {
   const { entries, loading, updateEntry } = useAnimeEntries();
   const [filters, setFilters] = useState<FilterOptions>({});
   const [viewMode, setViewMode] = useState<'list' | 'season'>('list');
+  const [sortField, setSortField] = useState<SortField>('season');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   const seasons = useMemo(() => getUniqueSeasons(entries), [entries]);
   const filtered = useMemo(() => filterEntries(entries, filters), [entries, filters]);
+
+  const sorted = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      let cmp = 0;
+      if (sortField === 'title') {
+        cmp = a.title.localeCompare(b.title, 'ja');
+      } else if (sortField === 'season') {
+        cmp = a.season.localeCompare(b.season);
+      } else if (sortField === 'rating') {
+        const ra = a.rating ?? 0;
+        const rb = b.rating ?? 0;
+        cmp = ra - rb;
+      }
+      return sortOrder === 'asc' ? cmp : -cmp;
+    });
+  }, [filtered, sortField, sortOrder]);
 
   const allYears = useMemo(() => {
     const years = new Set<number>();
@@ -152,6 +173,33 @@ export function HomePage() {
 
       {viewMode === 'list' && (
         <>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
+            <span style={{ fontSize: '13px', color: '#6b7280' }}>並び順:</span>
+            <select
+              value={sortField}
+              onChange={(e) => setSortField(e.target.value as SortField)}
+              style={filterInputStyle}
+            >
+              <option value="season">放送日時順</option>
+              <option value="title">名前順</option>
+              <option value="rating">評価順</option>
+            </select>
+            <button
+              type="button"
+              onClick={() => setSortOrder(o => o === 'asc' ? 'desc' : 'asc')}
+              style={{
+                padding: '6px 10px',
+                border: '1px solid #f9a8d4',
+                borderRadius: '6px',
+                backgroundColor: '#ffffff',
+                color: '#1f2937',
+                fontSize: '13px',
+                cursor: 'pointer',
+              }}
+            >
+              {sortOrder === 'asc' ? '昇順 ↑' : '降順 ↓'}
+            </button>
+          </div>
           <div style={filterBarStyle}>
             <input
               type="text"
@@ -207,7 +255,7 @@ export function HomePage() {
             </label>
           </div>
 
-          {filtered.length === 0 ? (
+          {sorted.length === 0 ? (
             <div style={emptyStyle}>
               {entries.length === 0 ? (
                 <>
@@ -221,7 +269,7 @@ export function HomePage() {
             </div>
           ) : (
             <div style={gridStyle}>
-              {filtered.map((entry) => (
+              {sorted.map((entry) => (
                 <AnimeCard
                   key={entry.id}
                   entry={entry}
