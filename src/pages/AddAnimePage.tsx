@@ -12,6 +12,7 @@ import { AnimeForm } from '../components/anime/AnimeForm.tsx';
 import type { AnimeFormData } from '../components/anime/AnimeForm.tsx';
 import { SearchInput } from '../components/common/SearchInput.tsx';
 import type { CSSProperties } from 'react';
+import { isAnimeRegistered } from '../services/animeService.ts';
 
 const containerStyle: CSSProperties = {
   maxWidth: '700px',
@@ -122,7 +123,7 @@ interface SelectionInfo {
 export function AddAnimePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { addEntry } = useAnimeEntries();
+  const { addEntry, entries } = useAnimeEntries();
   const { query, setQuery, results, loading, error } = useAniListSearch();
   const { query: vaQuery, search: vaSearch, results: vaResults, loading: vaLoading, error: vaError } = useVoiceActorSearch();
 
@@ -354,8 +355,23 @@ export function AddAnimePage() {
                         <img src={media.coverImage.medium} alt="" style={thumbStyle} />
                       )}
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ color: '#1f2937', fontSize: '14px', fontWeight: 600 }}>
-                          {extractTitle(media)}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          <span style={{ color: '#1f2937', fontSize: '14px', fontWeight: 600 }}>
+                            {extractTitle(media)}
+                          </span>
+                          {isAnimeRegistered(entries, media.id) && (
+                            <span style={{
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              padding: '2px 7px',
+                              borderRadius: '9999px',
+                              backgroundColor: '#fce7f3',
+                              color: '#ec4899',
+                              flexShrink: 0,
+                            }}>
+                              追加済み
+                            </span>
+                          )}
                         </div>
                         <div style={{ color: '#6b7280', fontSize: '12px' }}>
                           {(media.genres || []).slice(0, 3).join(', ')}

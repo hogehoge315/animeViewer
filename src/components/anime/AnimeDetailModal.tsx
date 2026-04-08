@@ -6,6 +6,7 @@ interface AnimeDetailModalProps {
   media: AniListMedia;
   onClose: () => void;
   onAdd: (media: AniListMedia) => void;
+  isRegistered?: boolean;
 }
 
 function getLinkIcon(link: AniListExternalLink): string {
@@ -182,7 +183,7 @@ const addButtonStyle: CSSProperties = {
   marginTop: '4px',
 };
 
-export function AnimeDetailModal({ media, onClose, onAdd }: AnimeDetailModalProps) {
+export function AnimeDetailModal({ media, onClose, onAdd, isRegistered = false }: AnimeDetailModalProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -274,10 +275,10 @@ export function AnimeDetailModal({ media, onClose, onAdd }: AnimeDetailModalProp
 
           <button
             type="button"
-            style={addButtonStyle}
-            onClick={() => onAdd(media)}
+            style={isRegistered ? { ...addButtonStyle, backgroundColor: '#d1d5db', color: '#6b7280', cursor: 'default' } : addButtonStyle}
+            onClick={() => { if (!isRegistered) onAdd(media); }}
           >
-            + リストに追加
+            {isRegistered ? '✓ 追加済み' : '+ リストに追加'}
           </button>
         </div>
       </div>
