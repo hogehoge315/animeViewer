@@ -90,3 +90,8 @@ export function getUniqueSeasons(entries: AnimeEntry[]): string[] {
   const seasons = new Set(entries.map((e) => e.season));
   return Array.from(seasons).sort().reverse();
 }
+
+export function isAnimeRegistered(entries: AnimeEntry[], anilistMediaId?: number): boolean {
+  if (anilistMediaId === undefined) return false;
+  return entries.some(e => e.anilistMediaId === anilistMediaId);
+}

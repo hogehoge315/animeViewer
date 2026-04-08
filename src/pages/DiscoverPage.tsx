@@ -6,6 +6,8 @@ import type { AniListPagedResult, AniListMedia } from '../api/anilist/types.ts';
 import { AnimeDetailModal } from '../components/anime/AnimeDetailModal.tsx';
 import type { CSSProperties } from 'react';
 import { VoiceActorSearchPage } from './VoiceActorSearchPage.tsx';
+import { useAnimeEntries } from '../hooks/useAnimeEntries.ts';
+import { isAnimeRegistered } from '../services/animeService.ts';
 
 type AniListSeason = 'WINTER' | 'SPRING' | 'SUMMER' | 'FALL';
 
@@ -56,6 +58,7 @@ function extractTitle(media: AniListMedia): string {
 
 export function DiscoverPage() {
   const navigate = useNavigate();
+  const { entries } = useAnimeEntries();
   const [activeTab, setActiveTab] = useState<'anime' | 'voice'>('anime');
   const { season: currentSeason, year: currentYear } = getCurrentSeason();
   const [selectedYear, setSelectedYear] = useState<number | undefined>(currentYear);
@@ -264,23 +267,42 @@ export function DiscoverPage() {
                   )}
                 </div>
                 <div onClick={(e) => e.stopPropagation()}>
-                  <Link
-                    to={`/add?mediaId=${media.id}&title=${encodeURIComponent(extractTitle(media))}&from=discover`}
-                    style={{
-                      flexShrink: 0,
-                      padding: '6px 12px',
-                      backgroundColor: '#ec4899',
-                      color: '#fff',
-                      textDecoration: 'none',
-                      borderRadius: '6px',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      alignSelf: 'center',
-                      display: 'block',
-                    }}
-                  >
-                    追加
-                  </Link>
+                  {isAnimeRegistered(entries, media.id) ? (
+                    <span
+                      style={{
+                        flexShrink: 0,
+                        padding: '6px 12px',
+                        backgroundColor: '#d1d5db',
+                        color: '#6b7280',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        display: 'block',
+                        cursor: 'default',
+                        alignSelf: 'center',
+                      }}
+                    >
+                      追加済み
+                    </span>
+                  ) : (
+                    <Link
+                      to={`/add?mediaId=${media.id}&title=${encodeURIComponent(extractTitle(media))}&from=discover`}
+                      style={{
+                        flexShrink: 0,
+                        padding: '6px 12px',
+                        backgroundColor: '#ec4899',
+                        color: '#fff',
+                        textDecoration: 'none',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        alignSelf: 'center',
+                        display: 'block',
+                      }}
+                    >
+                      追加
+                    </Link>
+                  )}
                 </div>
               </div>
             );
@@ -292,6 +314,7 @@ export function DiscoverPage() {
         <AnimeDetailModal
           media={detailMedia}
           onClose={() => setDetailMedia(null)}
+          isRegistered={isAnimeRegistered(entries, detailMedia.id)}
           onAdd={(media) => {
             setDetailMedia(null);
             navigate(`/add?mediaId=${media.id}&title=${encodeURIComponent(extractTitle(media))}&from=discover`);
