@@ -75,10 +75,11 @@ export function HomePage() {
   const filtered = useMemo(() => filterEntries(entries, filters), [entries, filters]);
 
   const sorted = useMemo(() => {
+    const jaCollator = new Intl.Collator('ja');
     return [...filtered].sort((a, b) => {
       let cmp = 0;
       if (sortField === 'title') {
-        cmp = a.title.localeCompare(b.title, 'ja');
+        cmp = jaCollator.compare(a.title, b.title);
       } else if (sortField === 'season') {
         cmp = a.season.localeCompare(b.season);
       } else if (sortField === 'rating') {
