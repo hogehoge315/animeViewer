@@ -64,6 +64,8 @@ const SEASON_NAMES = ['春', '夏', '秋', '冬'] as const;
 type SortField = 'title' | 'season' | 'rating';
 type SortOrder = 'asc' | 'desc';
 
+const jaCollator = new Intl.Collator('ja');
+
 export function HomePage() {
   const { entries, loading, updateEntry } = useAnimeEntries();
   const [filters, setFilters] = useState<FilterOptions>({});
@@ -75,7 +77,6 @@ export function HomePage() {
   const filtered = useMemo(() => filterEntries(entries, filters), [entries, filters]);
 
   const sorted = useMemo(() => {
-    const jaCollator = new Intl.Collator('ja');
     return [...filtered].sort((a, b) => {
       let cmp = 0;
       if (sortField === 'title') {

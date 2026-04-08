@@ -275,6 +275,7 @@ export function AnimeDetailModal({ media, onClose, onAdd, isRegistered = false }
 
           <button
             type="button"
+            disabled={isRegistered}
             style={isRegistered ? { ...addButtonStyle, backgroundColor: '#d1d5db', color: '#6b7280', cursor: 'default' } : addButtonStyle}
             onClick={() => { if (!isRegistered) onAdd(media); }}
           >
