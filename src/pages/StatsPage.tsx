@@ -162,6 +162,7 @@ function computeStats(entries: AnimeEntry[]) {
   for (const e of entries) {
     for (const va of e.voiceActors) {
       const name = va.nameNative || va.name;
+      if (!name) continue;
       vaCounts.set(name, (vaCounts.get(name) || 0) + 1);
     }
   }
