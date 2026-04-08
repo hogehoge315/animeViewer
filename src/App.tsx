@@ -4,6 +4,7 @@ import { AddAnimePage } from './pages/AddAnimePage.tsx';
 import { DetailPage } from './pages/DetailPage.tsx';
 import { ImportExportPage } from './pages/ImportExportPage.tsx';
 import { DiscoverPage } from './pages/DiscoverPage.tsx';
+import { StatsPage } from './pages/StatsPage.tsx';
 import { ErrorBoundary } from './components/common/ErrorBoundary.tsx';
 import type { CSSProperties } from 'react';
 
@@ -38,6 +39,7 @@ function NavBar() {
       <NavLink to="/" end style={getStyle}>ホーム</NavLink>
       <NavLink to="/add" style={getStyle}>追加</NavLink>
       <NavLink to="/discover" style={getStyle}>探す</NavLink>
+      <NavLink to="/stats" style={getStyle}>統計</NavLink>
       <NavLink to="/settings" style={getStyle}>設定</NavLink>
     </nav>
   );
@@ -69,6 +71,7 @@ export function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/add" element={<AddAnimePage />} />
             <Route path="/discover" element={<DiscoverPage />} />
+            <Route path="/stats" element={<StatsPage />} />
             <Route path="/anime/:id" element={<DetailPage />} />
             <Route path="/settings" element={<ImportExportPage />} />
           </Routes>
